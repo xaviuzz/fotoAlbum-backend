@@ -1,0 +1,17 @@
+{
+	"name": "fotoalbum-backend",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"start": "bun src/main.ts",
+		"test": "bun test",
+		"lint": "biome check .",
+		"typecheck": "tsc --noEmit",
+		"build": "bun build src/main.ts --target bun --outdir dist"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.15",
+		"@types/bun": "^1.4.3",
+		"typescript": "^7.0.2"
+	}
+}

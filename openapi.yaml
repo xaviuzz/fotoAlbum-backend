@@ -12,42 +12,42 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/HealthCheckRequest"
+              $ref: "#/components/schemas/HealthCheckCall"
       responses:
         "200":
           description: ok, or an error carried in the message
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HealthCheckResponse"
+                $ref: "#/components/schemas/HealthCheckReply"
         "400":
-          description: unreadable JSON or missing requestId
+          description: unreadable JSON or missing callId
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransportError"
 components:
   schemas:
-    RequestHeader:
+    CallHeader:
       type: object
-      required: [requestId]
+      required: [callId]
       properties:
-        requestId:
+        callId:
           type: string
           minLength: 1
-    HealthCheckRequest:
+    HealthCheckCall:
       type: object
       required: [header]
       properties:
         header:
-          $ref: "#/components/schemas/RequestHeader"
+          $ref: "#/components/schemas/CallHeader"
         body:
           type: object
-    ResponseHeader:
+    ReplyHeader:
       type: object
-      required: [requestId, status]
+      required: [callId, status]
       properties:
-        requestId:
+        callId:
           type: string
         status:
           type: string
@@ -58,15 +58,15 @@ components:
       properties:
         code:
           type: string
-          enum: [INVALID_REQUEST, INTERNAL_ERROR]
+          enum: [INVALID_BODY, INTERNAL_ERROR]
         message:
           type: string
-    HealthCheckResponse:
+    HealthCheckReply:
       type: object
       required: [header, body]
       properties:
         header:
-          $ref: "#/components/schemas/ResponseHeader"
+          $ref: "#/components/schemas/ReplyHeader"
         body:
           oneOf:
             - type: object

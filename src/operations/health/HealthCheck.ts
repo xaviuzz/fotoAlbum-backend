@@ -1,6 +1,6 @@
-import { EnvelopedOperation } from "../EnvelopedOperation.ts";
+import { CallOperation } from "../CallOperation.ts";
 
-export class HealthCheck extends EnvelopedOperation {
+export class HealthCheck extends CallOperation {
 	readonly name = "health.check";
 
 	protected validate(): void {}

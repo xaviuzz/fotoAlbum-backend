@@ -1,21 +1,20 @@
 import { expect, test } from "bun:test";
-import { EnvelopedOperation } from "../../src/operations/EnvelopedOperation.ts";
-import { InvalidRequestError } from "../../src/operations/InvalidRequestError.ts";
+import type { Body } from "../../src/call/Body.ts";
+import { CallOperation } from "../../src/operations/CallOperation.ts";
 
-class EchoOperation extends EnvelopedOperation {
+class EchoOperation extends CallOperation {
 	readonly name = "test.echo";
 
-	protected validate(body: Record<string, unknown>): void {
-		if (typeof body.text !== "string") {
-			throw new InvalidRequestError("text is required");
-		}
+	protected validate(body: Body): void {
+		body.requireText("text");
 	}
 
-	protected async execute(body: Record<string, unknown>): Promise<unknown> {
-		if (body.text === "crash") {
+	protected async execute(body: Body): Promise<unknown> {
+		const text = body.requireText("text");
+		if (text === "crash") {
 			throw new Error("boom");
 		}
-		return { text: body.text };
+		return { text };
 	}
 }
 
@@ -23,9 +22,9 @@ function post(payload: string): Request {
 	return new Request("http://x/test.echo", { method: "POST", body: payload });
 }
 
-test("answers 200 ok echoing the request id", async () => {
+test("answers 200 ok echoing the call id", async () => {
 	const payload = JSON.stringify({
-		header: { requestId: "r-1" },
+		header: { callId: "r-1" },
 		body: { text: "hi" },
 	});
 
@@ -33,7 +32,7 @@ test("answers 200 ok echoing the request id", async () => {
 
 	expect(response.status).toBe(200);
 	expect(await response.json()).toEqual({
-		header: { requestId: "r-1", status: "ok" },
+		header: { callId: "r-1", status: "ok" },
 		body: { text: "hi" },
 	});
 });
@@ -44,7 +43,7 @@ test("answers 400 when the JSON is unreadable", async () => {
 	expect(response.status).toBe(400);
 });
 
-test("answers 400 when the request id is missing", async () => {
+test("answers 400 when the call id is missing", async () => {
 	const payload = JSON.stringify({ header: {}, body: { text: "hi" } });
 
 	const response = await new EchoOperation().serve(post(payload));
@@ -52,21 +51,21 @@ test("answers 400 when the request id is missing", async () => {
 	expect(response.status).toBe(400);
 });
 
-test("answers 200 INVALID_REQUEST when the body is invalid", async () => {
-	const payload = JSON.stringify({ header: { requestId: "r-2" }, body: {} });
+test("answers 200 INVALID_BODY when the body is invalid", async () => {
+	const payload = JSON.stringify({ header: { callId: "r-2" }, body: {} });
 
 	const response = await new EchoOperation().serve(post(payload));
 
 	expect(response.status).toBe(200);
 	expect(await response.json()).toEqual({
-		header: { requestId: "r-2", status: "error" },
-		body: { code: "INVALID_REQUEST", message: "text is required" },
+		header: { callId: "r-2", status: "error" },
+		body: { code: "INVALID_BODY", message: "text is required" },
 	});
 });
 
 test("answers 200 INTERNAL_ERROR when execution fails", async () => {
 	const payload = JSON.stringify({
-		header: { requestId: "r-3" },
+		header: { callId: "r-3" },
 		body: { text: "crash" },
 	});
 
@@ -74,7 +73,7 @@ test("answers 200 INTERNAL_ERROR when execution fails", async () => {
 
 	expect(response.status).toBe(200);
 	expect(await response.json()).toEqual({
-		header: { requestId: "r-3", status: "error" },
+		header: { callId: "r-3", status: "error" },
 		body: { code: "INTERNAL_ERROR", message: "internal error" },
 	});
 });

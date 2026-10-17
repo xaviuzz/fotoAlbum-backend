@@ -1,0 +1,80 @@
+openapi: 3.0.3
+info:
+  title: fotoAlbum API
+  version: 0.1.0
+paths:
+  /health.check:
+    post:
+      operationId: healthCheck
+      summary: Tells whether the service is alive
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HealthCheckRequest"
+      responses:
+        "200":
+          description: ok, or an error carried in the message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthCheckResponse"
+        "400":
+          description: unreadable JSON or missing requestId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransportError"
+components:
+  schemas:
+    RequestHeader:
+      type: object
+      required: [requestId]
+      properties:
+        requestId:
+          type: string
+          minLength: 1
+    HealthCheckRequest:
+      type: object
+      required: [header]
+      properties:
+        header:
+          $ref: "#/components/schemas/RequestHeader"
+        body:
+          type: object
+    ResponseHeader:
+      type: object
+      required: [requestId, status]
+      properties:
+        requestId:
+          type: string
+        status:
+          type: string
+          enum: [ok, error]
+    ErrorBody:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum: [INVALID_REQUEST, INTERNAL_ERROR]
+        message:
+          type: string
+    HealthCheckResponse:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/ResponseHeader"
+        body:
+          oneOf:
+            - type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [ok]
+            - $ref: "#/components/schemas/ErrorBody"
+    TransportError:
+      $ref: "#/components/schemas/ErrorBody"

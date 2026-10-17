@@ -11,6 +11,10 @@ TypeScript API on Bun. Owns the contract, `openapi.yaml`. Part of the fotoAlbum 
 
 A change is done when test, lint, typecheck and build pass.
 
+## Image
+
+`Dockerfile` runs `bun run start` from source on port 3000 (`PORT`); `fotoAlbum-e2e` builds it. `docker build -t fotoalbum-backend .`. In this sandbox `docker run` fails on bridge networking; add `--network host`.
+
 ## Stack
 
 `Bun.serve` and `bun test`, no framework, no validation library. Biome and TypeScript are the only dev dependencies. Add nothing else without asking.

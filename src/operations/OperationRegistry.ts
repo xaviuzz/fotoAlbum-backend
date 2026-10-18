@@ -1,3 +1,6 @@
+import { Catalogue } from "../album/Catalogue.ts";
+import { AlbumGet } from "./album/AlbumGet.ts";
+import { AlbumList } from "./album/AlbumList.ts";
 import { HealthCheck } from "./health/HealthCheck.ts";
 import { NoOperation } from "./NoOperation.ts";
 import type { Operation } from "./Operation.ts";
@@ -12,7 +15,12 @@ export class OperationRegistry {
 	}
 
 	static standard(): OperationRegistry {
-		return new OperationRegistry([new HealthCheck()]);
+		const catalogue = Catalogue.seeded();
+		return new OperationRegistry([
+			new HealthCheck(),
+			new AlbumList(catalogue),
+			new AlbumGet(catalogue),
+		]);
 	}
 
 	find(name: string): Operation {

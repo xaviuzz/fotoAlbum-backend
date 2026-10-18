@@ -104,7 +104,7 @@ components:
       properties:
         code:
           type: string
-          enum: [INVALID_BODY, INTERNAL_ERROR]
+          enum: [INVALID_BODY, ALBUM_NOT_FOUND, INTERNAL_ERROR]
         message:
           type: string
     HealthCheckReply:

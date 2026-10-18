@@ -1,4 +1,5 @@
 import { beforeEach, expect, test } from "bun:test";
+import { AlbumNotFoundError } from "../../src/album/AlbumNotFoundError.ts";
 import type { Body } from "../../src/call/Body.ts";
 import { CallOperation } from "../../src/operations/CallOperation.ts";
 
@@ -50,6 +51,16 @@ test("answers 200 INTERNAL_ERROR when execution fails", async () => {
 	});
 });
 
+test("answers 200 ALBUM_NOT_FOUND when the album is not found", async () => {
+	await sut.call("r-4", { text: "missing" });
+
+	expect(sut.status()).toBe(200);
+	expect(await sut.reply()).toEqual({
+		header: { callId: "r-4", status: "error" },
+		body: { code: "ALBUM_NOT_FOUND", message: "album not found" },
+	});
+});
+
 class SUT {
 	private readonly operation = new EchoOperation();
 	private response = new Response();
@@ -97,6 +108,9 @@ class EchoOperation extends CallOperation {
 		const text = body.requireText("text");
 		if (text === "crash") {
 			throw new Error("boom");
+		}
+		if (text === "missing") {
+			throw new AlbumNotFoundError("album not found");
 		}
 		return { text };
 	}

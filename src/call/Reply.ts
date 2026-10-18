@@ -1,4 +1,4 @@
-export type ErrorCode = "INVALID_BODY" | "INTERNAL_ERROR";
+export type ErrorCode = "INVALID_BODY" | "ALBUM_NOT_FOUND" | "INTERNAL_ERROR";
 
 type Status = "ok" | "error";
 

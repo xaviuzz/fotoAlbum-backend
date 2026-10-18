@@ -1,3 +1,4 @@
+import { AlbumNotFoundError } from "../album/AlbumNotFoundError.ts";
 import type { Body } from "../call/Body.ts";
 import { Call } from "../call/Call.ts";
 import { InvalidBodyError } from "../call/InvalidBodyError.ts";
@@ -40,6 +41,9 @@ export abstract class CallOperation implements Operation {
 		let answer = call.failure("INTERNAL_ERROR", "internal error");
 		if (error instanceof InvalidBodyError) {
 			answer = call.failure("INVALID_BODY", error.message);
+		}
+		if (error instanceof AlbumNotFoundError) {
+			answer = call.failure("ALBUM_NOT_FOUND", error.message);
 		}
 		return answer;
 	}

@@ -26,6 +26,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransportError"
+  /album.list:
+    post:
+      operationId: albumList
+      summary: Lists every album of the catalogue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlbumListCall"
+      responses:
+        "200":
+          description: ok, or an error carried in the message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlbumListReply"
+        "400":
+          description: unreadable JSON or missing callId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransportError"
+  /album.get:
+    post:
+      operationId: albumGet
+      summary: Answers the album of a reference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlbumGetCall"
+      responses:
+        "200":
+          description: ok, or an error carried in the message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlbumGetReply"
+        "400":
+          description: unreadable JSON or missing callId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransportError"
 components:
   schemas:
     CallHeader:
@@ -75,6 +121,88 @@ components:
                 status:
                   type: string
                   enum: [ok]
+            - $ref: "#/components/schemas/ErrorBody"
+    Size:
+      type: object
+      required: [width, height]
+      properties:
+        width:
+          type: integer
+          minimum: 1
+        height:
+          type: integer
+          minimum: 1
+    Album:
+      type: object
+      required: [reference, commercialName, albumSize, pageSize, pageCount, binding, orientation]
+      properties:
+        reference:
+          type: string
+        commercialName:
+          type: string
+        albumSize:
+          $ref: "#/components/schemas/Size"
+        pageSize:
+          $ref: "#/components/schemas/Size"
+        pageCount:
+          type: integer
+          minimum: 2
+        binding:
+          type: string
+          enum: [hardcover, softcover]
+        orientation:
+          type: string
+          enum: [square, portrait, landscape]
+    AlbumListCall:
+      type: object
+      required: [header]
+      properties:
+        header:
+          $ref: "#/components/schemas/CallHeader"
+        body:
+          type: object
+    AlbumListReply:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/ReplyHeader"
+        body:
+          oneOf:
+            - type: object
+              required: [albums]
+              properties:
+                albums:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Album"
+            - $ref: "#/components/schemas/ErrorBody"
+    AlbumGetCall:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/CallHeader"
+        body:
+          type: object
+          required: [reference]
+          properties:
+            reference:
+              type: string
+              minLength: 1
+    AlbumGetReply:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/ReplyHeader"
+        body:
+          oneOf:
+            - type: object
+              required: [album]
+              properties:
+                album:
+                  $ref: "#/components/schemas/Album"
             - $ref: "#/components/schemas/ErrorBody"
     TransportError:
       $ref: "#/components/schemas/ErrorBody"

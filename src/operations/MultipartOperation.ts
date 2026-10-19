@@ -1,7 +1,7 @@
 import {
 	type MultipartHandler,
 	MultipartTransport,
-} from "../transport/MultipartTransport.ts";
+} from "../infrastructure/transport/MultipartTransport.ts";
 import type { Operation } from "./Operation.ts";
 
 export class MultipartOperation implements Operation {

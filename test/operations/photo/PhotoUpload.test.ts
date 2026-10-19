@@ -3,11 +3,11 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import sharp from "sharp";
+import { SessionId } from "../../../src/domain/session/SessionId.ts";
+import { PhotoStore } from "../../../src/infrastructure/stores/photo/PhotoStore.ts";
 import { MultipartOperation } from "../../../src/operations/MultipartOperation.ts";
 import type { Operation } from "../../../src/operations/Operation.ts";
 import { PhotoUpload } from "../../../src/operations/photo/PhotoUpload.ts";
-import { SessionId } from "../../../src/session/SessionId.ts";
-import { PhotoStore } from "../../../src/stores/photo/PhotoStore.ts";
 
 let sut: SUT;
 

@@ -2,12 +2,12 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Catalogue } from "../../../src/album/Catalogue.ts";
+import { Catalogue } from "../../../src/domain/album/Catalogue.ts";
+import { UserAlbumStore } from "../../../src/infrastructure/stores/userAlbum/UserAlbumStore.ts";
 import { JsonOperation } from "../../../src/operations/JsonOperation.ts";
 import type { Operation } from "../../../src/operations/Operation.ts";
 import { UserAlbumCreate } from "../../../src/operations/userAlbum/UserAlbumCreate.ts";
 import { UserAlbumGet } from "../../../src/operations/userAlbum/UserAlbumGet.ts";
-import { UserAlbumStore } from "../../../src/stores/userAlbum/UserAlbumStore.ts";
 
 let sut: SUT;
 

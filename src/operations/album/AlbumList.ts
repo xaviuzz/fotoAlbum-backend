@@ -1,5 +1,5 @@
-import type { Catalogue } from "../../album/Catalogue.ts";
-import type { JsonHandler } from "../../transport/JsonTransport.ts";
+import type { Catalogue } from "../../domain/album/Catalogue.ts";
+import type { JsonHandler } from "../../infrastructure/transport/JsonTransport.ts";
 
 export class AlbumList implements JsonHandler {
 	readonly name = "album.list";

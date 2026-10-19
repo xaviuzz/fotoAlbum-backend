@@ -1,6 +1,6 @@
-import { Catalogue } from "../album/Catalogue.ts";
+import { Catalogue } from "../domain/album/Catalogue.ts";
+import type { Stores } from "../infrastructure/stores/Stores.ts";
 import type { Routes } from "../Routes.ts";
-import type { Stores } from "../stores/Stores.ts";
 import { AlbumGet } from "./album/AlbumGet.ts";
 import { AlbumList } from "./album/AlbumList.ts";
 import { HealthCheck } from "./health/HealthCheck.ts";

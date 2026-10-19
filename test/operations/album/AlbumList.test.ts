@@ -1,5 +1,5 @@
 import { beforeEach, expect, test } from "bun:test";
-import { Catalogue } from "../../../src/album/Catalogue.ts";
+import { Catalogue } from "../../../src/domain/album/Catalogue.ts";
 import { AlbumList } from "../../../src/operations/album/AlbumList.ts";
 import { JsonOperation } from "../../../src/operations/JsonOperation.ts";
 

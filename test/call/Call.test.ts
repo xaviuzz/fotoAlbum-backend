@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { Call } from "../../src/call/Call.ts";
 import { InvalidBodyError } from "../../src/call/InvalidBodyError.ts";
 import { InvalidCallError } from "../../src/call/InvalidCallError.ts";
-import { SessionRequiredError } from "../../src/session/SessionRequiredError.ts";
+import { SessionRequiredError } from "../../src/domain/session/SessionRequiredError.ts";
 
 test("reads the body", () => {
 	const raw = { header: { callId: "abc-1" }, body: { name: "x" } };

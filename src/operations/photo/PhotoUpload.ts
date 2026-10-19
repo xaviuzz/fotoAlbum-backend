@@ -1,11 +1,11 @@
 import type { Call } from "../../call/Call.ts";
 import { InvalidBodyError } from "../../call/InvalidBodyError.ts";
-import { Picture } from "../../photo/Picture.ts";
-import { RefusalError } from "../../photo/RefusalError.ts";
-import { UploadOutcome } from "../../photo/UploadOutcome.ts";
-import type { SessionId } from "../../session/SessionId.ts";
-import type { PhotoStore } from "../../stores/photo/PhotoStore.ts";
-import type { MultipartHandler } from "../../transport/MultipartTransport.ts";
+import type { SessionId } from "../../domain/session/SessionId.ts";
+import { Picture } from "../../infrastructure/imaging/Picture.ts";
+import { RefusalError } from "../../infrastructure/imaging/RefusalError.ts";
+import type { PhotoStore } from "../../infrastructure/stores/photo/PhotoStore.ts";
+import type { MultipartHandler } from "../../infrastructure/transport/MultipartTransport.ts";
+import { UploadOutcome } from "./UploadOutcome.ts";
 
 export class PhotoUpload implements MultipartHandler {
 	readonly name = "photo.upload";

@@ -1,6 +1,6 @@
 import { beforeAll, expect, test } from "bun:test";
+import { Stores } from "../src/infrastructure/stores/Stores.ts";
 import { OperationRegistry } from "../src/operations/OperationRegistry.ts";
-import { Stores } from "../src/stores/Stores.ts";
 import { OpenApiRoutes } from "./OpenApiRoutes.ts";
 
 let sut: SUT;

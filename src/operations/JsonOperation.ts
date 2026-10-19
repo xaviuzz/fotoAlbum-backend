@@ -1,4 +1,7 @@
-import { type JsonHandler, JsonTransport } from "../transport/JsonTransport.ts";
+import {
+	type JsonHandler,
+	JsonTransport,
+} from "../infrastructure/transport/JsonTransport.ts";
 import type { Operation } from "./Operation.ts";
 
 export class JsonOperation implements Operation {

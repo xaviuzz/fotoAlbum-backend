@@ -2,10 +2,10 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { SessionId } from "../../../src/domain/session/SessionId.ts";
+import { PhotoStore } from "../../../src/infrastructure/stores/photo/PhotoStore.ts";
 import { ThumbnailRoute } from "../../../src/resources/photo/ThumbnailRoute.ts";
-import { SessionId } from "../../../src/session/SessionId.ts";
-import { PhotoStore } from "../../../src/stores/photo/PhotoStore.ts";
-import { aPicture } from "../../photo/Pictures.ts";
+import { aPicture } from "../../infrastructure/imaging/Pictures.ts";
 
 let sut: SUT;
 

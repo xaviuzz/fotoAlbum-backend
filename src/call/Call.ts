@@ -1,4 +1,4 @@
-import { SessionId } from "../session/SessionId.ts";
+import { SessionId } from "../domain/session/SessionId.ts";
 import { Body } from "./Body.ts";
 import { CallError } from "./CallError.ts";
 import { InvalidCallError } from "./InvalidCallError.ts";

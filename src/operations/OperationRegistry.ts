@@ -1,9 +1,12 @@
 import { Catalogue } from "../album/Catalogue.ts";
+import type { PhotoStore } from "../photo/PhotoStore.ts";
 import { AlbumGet } from "./album/AlbumGet.ts";
 import { AlbumList } from "./album/AlbumList.ts";
 import { HealthCheck } from "./health/HealthCheck.ts";
 import { NoOperation } from "./NoOperation.ts";
 import type { Operation } from "./Operation.ts";
+import { PhotoList } from "./photo/PhotoList.ts";
+import { PhotoUpload } from "./photo/PhotoUpload.ts";
 
 export class OperationRegistry {
 	private readonly operationsByName = new Map<string, Operation>();
@@ -14,12 +17,14 @@ export class OperationRegistry {
 		}
 	}
 
-	static standard(): OperationRegistry {
+	static standard(store: PhotoStore): OperationRegistry {
 		const catalogue = Catalogue.seeded();
 		return new OperationRegistry([
 			new HealthCheck(),
 			new AlbumList(catalogue),
 			new AlbumGet(catalogue),
+			new PhotoList(store),
+			new PhotoUpload(store),
 		]);
 	}
 

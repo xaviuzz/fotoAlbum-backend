@@ -1,6 +1,6 @@
 import { OperationRegistry } from "./operations/OperationRegistry.ts";
-import { ResourceRegistry } from "./resource/ResourceRegistry.ts";
-import { Stores } from "./Stores.ts";
+import { ResourceRegistry } from "./resources/ResourceRegistry.ts";
+import { Stores } from "./stores/Stores.ts";
 
 const ONE_GIGABYTE = 1024 * 1024 * 1024;
 

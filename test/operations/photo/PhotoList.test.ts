@@ -5,8 +5,8 @@ import { join } from "node:path";
 import { JsonOperation } from "../../../src/operations/JsonOperation.ts";
 import type { Operation } from "../../../src/operations/Operation.ts";
 import { PhotoList } from "../../../src/operations/photo/PhotoList.ts";
-import { PhotoStore } from "../../../src/photo/PhotoStore.ts";
 import { SessionId } from "../../../src/session/SessionId.ts";
+import { PhotoStore } from "../../../src/stores/photo/PhotoStore.ts";
 import { aPicture } from "../../photo/Pictures.ts";
 
 let sut: SUT;

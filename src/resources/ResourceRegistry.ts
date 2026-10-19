@@ -1,6 +1,6 @@
-import { ThumbnailRoute } from "../photo/ThumbnailRoute.ts";
 import type { Routes } from "../Routes.ts";
-import type { Stores } from "../Stores.ts";
+import type { Stores } from "../stores/Stores.ts";
+import { ThumbnailRoute } from "./photo/ThumbnailRoute.ts";
 import type { ResourceRoute } from "./ResourceRoute.ts";
 
 export class ResourceRegistry {

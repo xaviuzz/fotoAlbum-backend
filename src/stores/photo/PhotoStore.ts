@@ -1,11 +1,11 @@
 import { mkdir, readdir } from "node:fs/promises";
 import { join } from "node:path";
-import type { SessionId } from "../session/SessionId.ts";
+import type { Picture } from "../../photo/Picture.ts";
+import type { SessionId } from "../../session/SessionId.ts";
 import { InvalidPhotoIdError } from "./InvalidPhotoIdError.ts";
 import { Photo } from "./Photo.ts";
 import { PhotoId } from "./PhotoId.ts";
 import { PhotoNotFoundError } from "./PhotoNotFoundError.ts";
-import type { Picture } from "./Picture.ts";
 
 const MISSING_FOLDER = "ENOENT";
 

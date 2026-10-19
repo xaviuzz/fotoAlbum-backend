@@ -1,4 +1,4 @@
-import { SessionId } from "../session/SessionId.ts";
+import { SessionId } from "../../session/SessionId.ts";
 import { InvalidThumbnailUrlError } from "./InvalidThumbnailUrlError.ts";
 import { PhotoId } from "./PhotoId.ts";
 

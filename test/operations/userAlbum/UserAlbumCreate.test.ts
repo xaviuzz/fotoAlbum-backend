@@ -7,7 +7,7 @@ import { JsonOperation } from "../../../src/operations/JsonOperation.ts";
 import type { Operation } from "../../../src/operations/Operation.ts";
 import { UserAlbumCreate } from "../../../src/operations/userAlbum/UserAlbumCreate.ts";
 import { SessionId } from "../../../src/session/SessionId.ts";
-import { UserAlbumStore } from "../../../src/userAlbum/UserAlbumStore.ts";
+import { UserAlbumStore } from "../../../src/stores/userAlbum/UserAlbumStore.ts";
 
 let sut: SUT;
 

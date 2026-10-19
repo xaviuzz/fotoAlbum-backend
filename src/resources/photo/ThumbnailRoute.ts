@@ -1,10 +1,10 @@
-import type { ResourceRoute } from "../resource/ResourceRoute.ts";
-import { SessionRequiredError } from "../session/SessionRequiredError.ts";
-import { InvalidPhotoIdError } from "./InvalidPhotoIdError.ts";
-import { InvalidThumbnailUrlError } from "./InvalidThumbnailUrlError.ts";
-import { PhotoNotFoundError } from "./PhotoNotFoundError.ts";
-import type { PhotoStore } from "./PhotoStore.ts";
-import { ThumbnailUrl } from "./ThumbnailUrl.ts";
+import { SessionRequiredError } from "../../session/SessionRequiredError.ts";
+import { InvalidPhotoIdError } from "../../stores/photo/InvalidPhotoIdError.ts";
+import { InvalidThumbnailUrlError } from "../../stores/photo/InvalidThumbnailUrlError.ts";
+import { PhotoNotFoundError } from "../../stores/photo/PhotoNotFoundError.ts";
+import type { PhotoStore } from "../../stores/photo/PhotoStore.ts";
+import { ThumbnailUrl } from "../../stores/photo/ThumbnailUrl.ts";
+import type { ResourceRoute } from "../ResourceRoute.ts";
 
 const A_YEAR = 31536000;
 

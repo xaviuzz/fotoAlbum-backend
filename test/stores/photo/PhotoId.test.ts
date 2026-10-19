@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { InvalidPhotoIdError } from "../../src/photo/InvalidPhotoIdError.ts";
-import { PhotoId } from "../../src/photo/PhotoId.ts";
+import { InvalidPhotoIdError } from "../../../src/stores/photo/InvalidPhotoIdError.ts";
+import { PhotoId } from "../../../src/stores/photo/PhotoId.ts";
 
 test("generates a different id each time", () => {
 	const first = PhotoId.generate();

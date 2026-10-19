@@ -1,8 +1,8 @@
 import type { Catalogue } from "../../album/Catalogue.ts";
 import type { Call } from "../../call/Call.ts";
+import { UserAlbum } from "../../stores/userAlbum/UserAlbum.ts";
+import type { UserAlbumStore } from "../../stores/userAlbum/UserAlbumStore.ts";
 import type { JsonHandler } from "../../transport/JsonTransport.ts";
-import { UserAlbum } from "../../userAlbum/UserAlbum.ts";
-import type { UserAlbumStore } from "../../userAlbum/UserAlbumStore.ts";
 
 export class UserAlbumCreate implements JsonHandler {
 	readonly name = "userAlbum.create";

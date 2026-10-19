@@ -1,4 +1,4 @@
-import { Album, type AlbumData } from "../album/Album.ts";
+import { Album, type AlbumData } from "../../album/Album.ts";
 
 export type UserAlbumData = AlbumData & { id: string };
 

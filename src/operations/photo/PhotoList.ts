@@ -1,5 +1,5 @@
 import type { Call } from "../../call/Call.ts";
-import type { PhotoStore } from "../../photo/PhotoStore.ts";
+import type { PhotoStore } from "../../stores/photo/PhotoStore.ts";
 import type { JsonHandler } from "../../transport/JsonTransport.ts";
 
 export class PhotoList implements JsonHandler {

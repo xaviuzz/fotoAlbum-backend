@@ -2,12 +2,12 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Album } from "../../src/album/Album.ts";
-import { SessionId } from "../../src/session/SessionId.ts";
-import { UserAlbum } from "../../src/userAlbum/UserAlbum.ts";
-import { UserAlbumAlreadyExistsError } from "../../src/userAlbum/UserAlbumAlreadyExistsError.ts";
-import { UserAlbumNotFoundError } from "../../src/userAlbum/UserAlbumNotFoundError.ts";
-import { UserAlbumStore } from "../../src/userAlbum/UserAlbumStore.ts";
+import { Album } from "../../../src/album/Album.ts";
+import { SessionId } from "../../../src/session/SessionId.ts";
+import { UserAlbum } from "../../../src/stores/userAlbum/UserAlbum.ts";
+import { UserAlbumAlreadyExistsError } from "../../../src/stores/userAlbum/UserAlbumAlreadyExistsError.ts";
+import { UserAlbumNotFoundError } from "../../../src/stores/userAlbum/UserAlbumNotFoundError.ts";
+import { UserAlbumStore } from "../../../src/stores/userAlbum/UserAlbumStore.ts";
 
 let sut: SUT;
 

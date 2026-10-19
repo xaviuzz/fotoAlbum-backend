@@ -1,6 +1,6 @@
 import { beforeEach, expect, test } from "bun:test";
-import { Album } from "../../src/album/Album.ts";
-import { UserAlbum } from "../../src/userAlbum/UserAlbum.ts";
+import { Album } from "../../../src/album/Album.ts";
+import { UserAlbum } from "../../../src/stores/userAlbum/UserAlbum.ts";
 
 let sut: SUT;
 

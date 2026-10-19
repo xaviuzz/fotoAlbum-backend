@@ -1,4 +1,4 @@
-import type { Photo } from "./Photo.ts";
+import type { Photo } from "../stores/photo/Photo.ts";
 import type { RefusalError, RejectionCode } from "./RefusalError.ts";
 
 type RejectedFile = { name: string; code: RejectionCode };

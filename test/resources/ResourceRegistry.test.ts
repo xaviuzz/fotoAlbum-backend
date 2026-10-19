@@ -1,6 +1,6 @@
 import { beforeEach, expect, test } from "bun:test";
-import { ResourceRegistry } from "../../src/resource/ResourceRegistry.ts";
-import type { ResourceRoute } from "../../src/resource/ResourceRoute.ts";
+import { ResourceRegistry } from "../../src/resources/ResourceRegistry.ts";
+import type { ResourceRoute } from "../../src/resources/ResourceRoute.ts";
 
 let sut: SUT;
 

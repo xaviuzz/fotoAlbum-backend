@@ -6,8 +6,8 @@ import sharp from "sharp";
 import { MultipartOperation } from "../../../src/operations/MultipartOperation.ts";
 import type { Operation } from "../../../src/operations/Operation.ts";
 import { PhotoUpload } from "../../../src/operations/photo/PhotoUpload.ts";
-import { PhotoStore } from "../../../src/photo/PhotoStore.ts";
 import { SessionId } from "../../../src/session/SessionId.ts";
+import { PhotoStore } from "../../../src/stores/photo/PhotoStore.ts";
 
 let sut: SUT;
 

@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { InvalidPhotoIdError } from "../../src/photo/InvalidPhotoIdError.ts";
-import { InvalidThumbnailUrlError } from "../../src/photo/InvalidThumbnailUrlError.ts";
-import { PhotoId } from "../../src/photo/PhotoId.ts";
-import { ThumbnailUrl } from "../../src/photo/ThumbnailUrl.ts";
-import { SessionId } from "../../src/session/SessionId.ts";
-import { SessionRequiredError } from "../../src/session/SessionRequiredError.ts";
+import { SessionId } from "../../../src/session/SessionId.ts";
+import { SessionRequiredError } from "../../../src/session/SessionRequiredError.ts";
+import { InvalidPhotoIdError } from "../../../src/stores/photo/InvalidPhotoIdError.ts";
+import { InvalidThumbnailUrlError } from "../../../src/stores/photo/InvalidThumbnailUrlError.ts";
+import { PhotoId } from "../../../src/stores/photo/PhotoId.ts";
+import { ThumbnailUrl } from "../../../src/stores/photo/ThumbnailUrl.ts";
 
 test("addresses the thumbnail of a photo inside its session", () => {
 	const photoId = PhotoId.generate();

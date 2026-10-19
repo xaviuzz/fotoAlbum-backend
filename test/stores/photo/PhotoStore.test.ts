@@ -2,11 +2,11 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { PhotoId } from "../../src/photo/PhotoId.ts";
-import { PhotoNotFoundError } from "../../src/photo/PhotoNotFoundError.ts";
-import { PhotoStore } from "../../src/photo/PhotoStore.ts";
-import { SessionId } from "../../src/session/SessionId.ts";
-import { aPicture } from "./Pictures.ts";
+import { SessionId } from "../../../src/session/SessionId.ts";
+import { PhotoId } from "../../../src/stores/photo/PhotoId.ts";
+import { PhotoNotFoundError } from "../../../src/stores/photo/PhotoNotFoundError.ts";
+import { PhotoStore } from "../../../src/stores/photo/PhotoStore.ts";
+import { aPicture } from "../../photo/Pictures.ts";
 
 let sut: SUT;
 

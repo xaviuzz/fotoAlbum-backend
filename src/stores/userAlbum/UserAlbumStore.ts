@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { SessionId } from "../session/SessionId.ts";
+import type { SessionId } from "../../session/SessionId.ts";
 import { UserAlbum } from "./UserAlbum.ts";
 import { UserAlbumAlreadyExistsError } from "./UserAlbumAlreadyExistsError.ts";
 import { UserAlbumNotFoundError } from "./UserAlbumNotFoundError.ts";

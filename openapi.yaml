@@ -72,6 +72,84 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransportError"
+  /photo.list:
+    post:
+      operationId: photoList
+      summary: Lists the photos of the session, oldest first
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PhotoListCall"
+      responses:
+        "200":
+          description: ok, or an error carried in the message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhotoListReply"
+        "400":
+          description: unreadable JSON or missing callId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransportError"
+  /photo.upload:
+    post:
+      operationId: photoUpload
+      summary: Stores the photos of the session and makes their thumbnails
+      description: The one operation that is not JSON. Rejected files do not stop the others.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PhotoUploadCall"
+      responses:
+        "200":
+          description: ok, or an error carried in the message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhotoUploadReply"
+        "400":
+          description: unreadable form or missing callId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransportError"
+  /photos/{sessionId}/{photoId}/thumbnail:
+    get:
+      operationId: photoThumbnail
+      summary: Serves the thumbnail of a photo
+      description: The single exception to the RPC style, because an img element can only GET.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: photoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: the thumbnail, always JPEG
+          headers:
+            Cache-Control:
+              description: public, immutable
+              schema:
+                type: string
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: unknown photo
 components:
   schemas:
     CallHeader:
@@ -79,6 +157,9 @@ components:
       required: [callId]
       properties:
         callId:
+          type: string
+          minLength: 1
+        sessionId:
           type: string
           minLength: 1
     HealthCheckCall:
@@ -104,7 +185,7 @@ components:
       properties:
         code:
           type: string
-          enum: [INVALID_BODY, ALBUM_NOT_FOUND, INTERNAL_ERROR]
+          enum: [INVALID_BODY, ALBUM_NOT_FOUND, SESSION_REQUIRED, INTERNAL_ERROR]
         message:
           type: string
     HealthCheckReply:
@@ -203,6 +284,84 @@ components:
               properties:
                 album:
                   $ref: "#/components/schemas/Album"
+            - $ref: "#/components/schemas/ErrorBody"
+    Photo:
+      type: object
+      required: [id, thumbnailUrl]
+      properties:
+        id:
+          type: string
+        thumbnailUrl:
+          type: string
+    RejectionCode:
+      type: string
+      enum: [UNSUPPORTED_FORMAT, TOO_LARGE, UNREADABLE_IMAGE]
+    RejectedFile:
+      type: object
+      required: [name, code]
+      properties:
+        name:
+          type: string
+        code:
+          $ref: "#/components/schemas/RejectionCode"
+    PhotoListCall:
+      type: object
+      required: [header]
+      properties:
+        header:
+          $ref: "#/components/schemas/CallHeader"
+        body:
+          type: object
+    PhotoListReply:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/ReplyHeader"
+        body:
+          oneOf:
+            - type: object
+              required: [photos]
+              properties:
+                photos:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Photo"
+            - $ref: "#/components/schemas/ErrorBody"
+    PhotoUploadCall:
+      type: object
+      required: [callId, sessionId, files]
+      properties:
+        callId:
+          type: string
+          minLength: 1
+        sessionId:
+          type: string
+          minLength: 1
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+    PhotoUploadReply:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/ReplyHeader"
+        body:
+          oneOf:
+            - type: object
+              required: [photos, rejected]
+              properties:
+                photos:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Photo"
+                rejected:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/RejectedFile"
             - $ref: "#/components/schemas/ErrorBody"
     TransportError:
       $ref: "#/components/schemas/ErrorBody"

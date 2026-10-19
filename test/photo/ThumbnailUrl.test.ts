@@ -23,14 +23,6 @@ test("reads back the session and the photo it addresses", () => {
 	expect(url.toString()).toBe(address);
 });
 
-test("recognises only the thumbnail path", () => {
-	const address = `/photos/s-1/${PhotoId.generate()}/thumbnail`;
-
-	expect(ThumbnailUrl.matches(address)).toBe(true);
-	expect(ThumbnailUrl.matches("/photos/s-1/abc")).toBe(false);
-	expect(ThumbnailUrl.matches("/album.list")).toBe(false);
-});
-
 test("refuses a path that is not a thumbnail path", () => {
 	expect(() => ThumbnailUrl.parse("/album.list")).toThrow(
 		InvalidThumbnailUrlError,

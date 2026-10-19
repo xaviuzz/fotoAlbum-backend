@@ -1,3 +1,4 @@
+import type { ResourceRoute } from "../resource/ResourceRoute.ts";
 import { SessionRequiredError } from "../session/SessionRequiredError.ts";
 import { InvalidPhotoIdError } from "./InvalidPhotoIdError.ts";
 import { InvalidThumbnailUrlError } from "./InvalidThumbnailUrlError.ts";
@@ -7,15 +8,10 @@ import { ThumbnailUrl } from "./ThumbnailUrl.ts";
 
 const A_YEAR = 31536000;
 
-export class ThumbnailRoute {
+export class ThumbnailRoute implements ResourceRoute {
 	constructor(private readonly store: PhotoStore) {}
 
-	serves(request: Request): boolean {
-		const isGet = request.method === "GET";
-		const path = new URL(request.url).pathname;
-		const isThumbnailPath = ThumbnailUrl.matches(path);
-		return isGet && isThumbnailPath;
-	}
+	readonly path = ThumbnailUrl.PATTERN;
 
 	async serve(request: Request): Promise<Response> {
 		const path = new URL(request.url).pathname;

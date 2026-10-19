@@ -1,12 +1,12 @@
 import { Catalogue } from "../album/Catalogue.ts";
 import type { PhotoStore } from "../photo/PhotoStore.ts";
+import type { Routes } from "../Routes.ts";
 import type { UserAlbumStore } from "../userAlbum/UserAlbumStore.ts";
 import { AlbumGet } from "./album/AlbumGet.ts";
 import { AlbumList } from "./album/AlbumList.ts";
 import { HealthCheck } from "./health/HealthCheck.ts";
 import { JsonOperation } from "./JsonOperation.ts";
 import { MultipartOperation } from "./MultipartOperation.ts";
-import { NoOperation } from "./NoOperation.ts";
 import type { Operation } from "./Operation.ts";
 import { PhotoList } from "./photo/PhotoList.ts";
 import { PhotoUpload } from "./photo/PhotoUpload.ts";
@@ -38,13 +38,14 @@ export class OperationRegistry {
 		]);
 	}
 
-	find(name: string): Operation {
-		let found: Operation = new NoOperation();
-		const registered = this.operationsByName.get(name);
-		if (registered !== undefined) {
-			found = registered;
+	routes(): Routes {
+		const routes: Routes = {};
+		for (const operation of this.operationsByName.values()) {
+			routes[`/${operation.name}`] = {
+				POST: (request) => operation.serve(request),
+			};
 		}
-		return found;
+		return routes;
 	}
 
 	names(): string[] {

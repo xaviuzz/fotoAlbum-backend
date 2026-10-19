@@ -8,32 +8,21 @@ beforeEach(() => {
 	sut = new SUT();
 });
 
-test("finds a registered operation by name", async () => {
-	sut.register("health.check");
-
-	const answer = await sut.answerTo("health.check");
-
-	expect(answer).toBe("health.check");
-});
-
-test("an unknown name answers 404", async () => {
-	sut.register("health.check");
-
-	const status = await sut.statusFor("nothing.here");
-
-	expect(status).toBe(404);
-});
-
-test("an empty registry answers 404 for any name", async () => {
-	const status = await sut.statusFor("health.check");
-
-	expect(status).toBe(404);
-});
-
 test("lists the names of the registered operations", () => {
 	sut.register("a.one", "b.two");
 
 	expect(sut.registeredNames()).toEqual(["a.one", "b.two"]);
+});
+
+test("hands over each operation as a POST route under its name", async () => {
+	sut.register("health.check", "album.list");
+
+	const paths = sut.routePaths();
+	const answer = await sut.answerToPost("/album.list");
+
+	expect(paths).toEqual(["/health.check", "/album.list"]);
+	expect(sut.methodsOf("/health.check")).toEqual(["POST"]);
+	expect(answer).toBe("album.list");
 });
 
 class SUT {
@@ -44,25 +33,23 @@ class SUT {
 		this.registry = new OperationRegistry(operations);
 	}
 
-	async answerTo(name: string): Promise<string> {
-		const response = await this.serve(name);
-		const answer = await response.text();
-		return answer;
+	routePaths(): string[] {
+		return Object.keys(this.registry.routes());
 	}
 
-	async statusFor(name: string): Promise<number> {
-		const response = await this.serve(name);
-		return response.status;
+	methodsOf(path: string): string[] {
+		return Object.keys(this.registry.routes()[path]);
+	}
+
+	async answerToPost(path: string): Promise<string> {
+		const post = this.registry.routes()[path].POST;
+		const response = await post?.(new Request(`http://x${path}`));
+		const answer = await response?.text();
+		return answer ?? "";
 	}
 
 	registeredNames(): string[] {
 		return this.registry.names();
-	}
-
-	private async serve(name: string): Promise<Response> {
-		const operation = this.registry.find(name);
-		const response = await operation.serve(new Request(`http://x/${name}`));
-		return response;
 	}
 }
 

@@ -5,6 +5,8 @@ import { PhotoId } from "./PhotoId.ts";
 const THUMBNAIL_PATH = /^\/photos\/([^/]+)\/([^/]+)\/thumbnail$/;
 
 export class ThumbnailUrl {
+	static readonly PATTERN = "/photos/:sessionId/:photoId/thumbnail";
+
 	private constructor(
 		readonly sessionId: SessionId,
 		readonly photoId: PhotoId,
@@ -12,10 +14,6 @@ export class ThumbnailUrl {
 
 	static of(sessionId: SessionId, photoId: PhotoId): ThumbnailUrl {
 		return new ThumbnailUrl(sessionId, photoId);
-	}
-
-	static matches(path: string): boolean {
-		return THUMBNAIL_PATH.test(path);
 	}
 
 	static parse(path: string): ThumbnailUrl {

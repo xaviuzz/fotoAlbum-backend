@@ -29,6 +29,18 @@ test("an unknown URL answers 404", async () => {
 	expect(sut.status()).toBe(404);
 });
 
+test("a GET to an operation URL answers 404", async () => {
+	await sut.getOperationUrl();
+
+	expect(sut.status()).toBe(404);
+});
+
+test("a POST to a thumbnail URL answers 404", async () => {
+	await sut.postToThumbnailUrl();
+
+	expect(sut.status()).toBe(404);
+});
+
 test("a photo uploaded to a session is listed and its thumbnail is served", async () => {
 	await sut.uploadPhoto("e-2", "s-1");
 	const address = await sut.firstThumbnailAddress("e-3", "s-1");
@@ -51,6 +63,14 @@ class SUT {
 
 	async callUnknownUrl(): Promise<void> {
 		await this.post("nothing.here", "{}");
+	}
+
+	async getOperationUrl(): Promise<void> {
+		this.response = await fetch(`${this.server.url}health.check`);
+	}
+
+	async postToThumbnailUrl(): Promise<void> {
+		await this.post("photos/s-1/abc/thumbnail", "{}");
 	}
 
 	status(): number {

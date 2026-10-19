@@ -56,11 +56,8 @@ test("answers 404 for a photo id that is not well formed", async () => {
 	expect(sut.status()).toBe(404);
 });
 
-test("recognises only GET requests for its path", () => {
-	expect(sut.serves("GET", "/photos/s-1/abc/thumbnail")).toBe(true);
-	expect(sut.serves("POST", "/photos/s-1/abc/thumbnail")).toBe(false);
-	expect(sut.serves("GET", "/photos/s-1/abc")).toBe(false);
-	expect(sut.serves("GET", "/album.list")).toBe(false);
+test("is served under the thumbnail path pattern", () => {
+	expect(sut.path()).toBe("/photos/:sessionId/:photoId/thumbnail");
 });
 
 type Kept = { id: string; thumbnail: Uint8Array };
@@ -90,8 +87,8 @@ class SUT {
 		this.response = await this.route.serve(new Request(`http://x${path}`));
 	}
 
-	serves(method: string, path: string): boolean {
-		return this.route.serves(new Request(`http://x${path}`, { method }));
+	path(): string {
+		return this.route.path;
 	}
 
 	status(): number {

@@ -4,25 +4,21 @@ import type { SessionId } from "../session/SessionId.ts";
 import { InvalidPhotoIdError } from "./InvalidPhotoIdError.ts";
 import { Photo } from "./Photo.ts";
 import { PhotoId } from "./PhotoId.ts";
+import { PhotoNotFoundError } from "./PhotoNotFoundError.ts";
+import type { Picture } from "./Picture.ts";
 
-export type Original = { bytes: Uint8Array; extension: string };
+const MISSING_FOLDER = "ENOENT";
 
 export class PhotoStore {
 	constructor(private readonly root: string) {}
 
-	async add(
-		sessionId: SessionId,
-		original: Original,
-		thumbnail: Uint8Array,
-	): Promise<Photo> {
+	async add(sessionId: SessionId, picture: Picture): Promise<Photo> {
 		const id = PhotoId.generate();
 		const folder = join(sessionId.pathIn(this.root), id.toString());
 		await mkdir(folder, { recursive: true });
-		await Bun.write(
-			join(folder, `original.${original.extension}`),
-			original.bytes,
-		);
-		await Bun.write(join(folder, "thumbnail.jpg"), thumbnail);
+		const originalName = `original.${picture.extension}`;
+		await Bun.write(join(folder, originalName), picture.original());
+		await Bun.write(join(folder, "thumbnail.jpg"), picture.thumbnail());
 		return new Photo(id, sessionId);
 	}
 
@@ -30,8 +26,10 @@ export class PhotoStore {
 		let names: string[] = [];
 		try {
 			names = await readdir(sessionId.pathIn(this.root));
-		} catch {
-			names = [];
+		} catch (error) {
+			if (!this.isMissingFolder(error)) {
+				throw error;
+			}
 		}
 		const photos: Photo[] = [];
 		for (const name of names.sort()) {
@@ -46,15 +44,19 @@ export class PhotoStore {
 	async thumbnailOf(
 		sessionId: SessionId,
 		photoId: PhotoId,
-	): Promise<Uint8Array<ArrayBuffer> | undefined> {
-		let bytes: Uint8Array<ArrayBuffer> | undefined;
+	): Promise<Uint8Array<ArrayBuffer>> {
 		const folder = join(sessionId.pathIn(this.root), photoId.toString());
 		const file = Bun.file(join(folder, "thumbnail.jpg"));
 		const exists = await file.exists();
-		if (exists) {
-			bytes = await file.bytes();
+		if (!exists) {
+			throw new PhotoNotFoundError("photo not found");
 		}
-		return bytes;
+		return file.bytes();
+	}
+
+	private isMissingFolder(error: unknown): boolean {
+		const code = (error as NodeJS.ErrnoException).code;
+		return code === MISSING_FOLDER;
 	}
 
 	private readId(name: string): PhotoId | undefined {

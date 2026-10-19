@@ -13,6 +13,7 @@ const EXTENSIONS: Record<string, string> = {
 export class Picture {
 	private constructor(
 		readonly extension: string,
+		private readonly originalBytes: Uint8Array,
 		private readonly thumbnailBytes: Uint8Array,
 	) {}
 
@@ -20,7 +21,11 @@ export class Picture {
 		const format = await Picture.readFormat(bytes);
 		const extension = Picture.extensionOf(format);
 		const thumbnail = await Picture.makeThumbnail(bytes);
-		return new Picture(extension, thumbnail);
+		return new Picture(extension, bytes, thumbnail);
+	}
+
+	original(): Uint8Array {
+		return this.originalBytes;
 	}
 
 	thumbnail(): Uint8Array {

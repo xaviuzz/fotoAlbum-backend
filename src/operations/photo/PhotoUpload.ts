@@ -95,12 +95,7 @@ export class PhotoUpload implements Operation {
 		try {
 			const bytes = await file.bytes();
 			const picture = await Picture.read(bytes);
-			const original = { bytes, extension: picture.extension };
-			const photo = await this.store.add(
-				sessionId,
-				original,
-				picture.thumbnail(),
-			);
+			const photo = await this.store.add(sessionId, picture);
 			photos.push(photo);
 		} catch (error) {
 			refusal = this.refusalFor(error);

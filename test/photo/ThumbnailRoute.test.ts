@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { PhotoStore } from "../../src/photo/PhotoStore.ts";
 import { ThumbnailRoute } from "../../src/photo/ThumbnailRoute.ts";
 import { SessionId } from "../../src/session/SessionId.ts";
+import { aPicture } from "./Pictures.ts";
 
 let sut: SUT;
 
@@ -17,16 +18,16 @@ afterEach(async () => {
 });
 
 test("serves a thumbnail as an immutable JPEG", async () => {
-	const id = await sut.keepPhoto("s-1", "pixels");
+	const kept = await sut.keepPhoto("s-1", 100);
 
-	await sut.get(`/photos/s-1/${id}/thumbnail`);
+	await sut.get(`/photos/s-1/${kept.id}/thumbnail`);
 
 	expect(sut.status()).toBe(200);
 	expect(sut.header("content-type")).toBe("image/jpeg");
 	expect(sut.header("cache-control")).toBe(
 		"public, max-age=31536000, immutable",
 	);
-	expect(await sut.text()).toBe("pixels");
+	expect(await sut.bytes()).toEqual(kept.thumbnail);
 });
 
 test("answers 404 for an unknown photo", async () => {
@@ -36,9 +37,9 @@ test("answers 404 for an unknown photo", async () => {
 });
 
 test("answers 404 for the photo of another session", async () => {
-	const id = await sut.keepPhoto("s-1", "pixels");
+	const kept = await sut.keepPhoto("s-1", 100);
 
-	await sut.get(`/photos/s-2/${id}/thumbnail`);
+	await sut.get(`/photos/s-2/${kept.id}/thumbnail`);
 
 	expect(sut.status()).toBe(404);
 });
@@ -62,6 +63,8 @@ test("recognises only GET requests for its path", () => {
 	expect(sut.serves("GET", "/album.list")).toBe(false);
 });
 
+type Kept = { id: string; thumbnail: Uint8Array };
+
 class SUT {
 	static async create(): Promise<SUT> {
 		const root = await mkdtemp(join(tmpdir(), "thumbnail-route-"));
@@ -77,15 +80,10 @@ class SUT {
 		this.route = new ThumbnailRoute(this.store);
 	}
 
-	async keepPhoto(session: string, thumbnailText: string): Promise<string> {
-		const original = new TextEncoder().encode("original");
-		const thumbnail = new TextEncoder().encode(thumbnailText);
-		const photo = await this.store.add(
-			SessionId.from(session),
-			{ bytes: original, extension: "jpg" },
-			thumbnail,
-		);
-		return photo.id.toString();
+	async keepPhoto(session: string, shade: number): Promise<Kept> {
+		const picture = await aPicture(shade);
+		const photo = await this.store.add(SessionId.from(session), picture);
+		return { id: photo.id.toString(), thumbnail: picture.thumbnail() };
 	}
 
 	async get(path: string): Promise<void> {
@@ -104,8 +102,8 @@ class SUT {
 		return this.response.headers.get(name);
 	}
 
-	async text(): Promise<string> {
-		return this.response.text();
+	async bytes(): Promise<Uint8Array> {
+		return new Uint8Array(await this.response.arrayBuffer());
 	}
 
 	async discard(): Promise<void> {

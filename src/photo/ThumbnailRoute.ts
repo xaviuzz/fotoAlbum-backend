@@ -1,6 +1,7 @@
 import { SessionRequiredError } from "../session/SessionRequiredError.ts";
 import { InvalidPhotoIdError } from "./InvalidPhotoIdError.ts";
 import { InvalidThumbnailUrlError } from "./InvalidThumbnailUrlError.ts";
+import { PhotoNotFoundError } from "./PhotoNotFoundError.ts";
 import type { PhotoStore } from "./PhotoStore.ts";
 import { ThumbnailUrl } from "./ThumbnailUrl.ts";
 
@@ -22,9 +23,7 @@ export class ThumbnailRoute {
 		try {
 			const url = ThumbnailUrl.parse(path);
 			const bytes = await this.store.thumbnailOf(url.sessionId, url.photoId);
-			if (bytes !== undefined) {
-				response = this.jpeg(bytes);
-			}
+			response = this.jpeg(bytes);
 		} catch (error) {
 			if (!this.isRefusal(error)) {
 				throw error;
@@ -37,7 +36,8 @@ export class ThumbnailRoute {
 		const isBadSession = error instanceof SessionRequiredError;
 		const isBadPhoto = error instanceof InvalidPhotoIdError;
 		const isBadPath = error instanceof InvalidThumbnailUrlError;
-		return isBadSession || isBadPhoto || isBadPath;
+		const isMissing = error instanceof PhotoNotFoundError;
+		return isBadSession || isBadPhoto || isBadPath || isMissing;
 	}
 
 	private jpeg(bytes: Uint8Array<ArrayBuffer>): Response {

@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { PhotoList } from "../../../src/operations/photo/PhotoList.ts";
 import { PhotoStore } from "../../../src/photo/PhotoStore.ts";
 import { SessionId } from "../../../src/session/SessionId.ts";
+import { aPicture } from "../../photo/Pictures.ts";
 
 let sut: SUT;
 
@@ -71,12 +72,8 @@ class SUT {
 	}
 
 	async keepPhoto(session: string): Promise<string> {
-		const bytes = new TextEncoder().encode("x");
-		const photo = await this.store.add(
-			SessionId.from(session),
-			{ bytes, extension: "jpg" },
-			bytes,
-		);
+		const picture = await aPicture(100);
+		const photo = await this.store.add(SessionId.from(session), picture);
 		return photo.id.toString();
 	}
 

@@ -16,6 +16,14 @@ test("names the extension of a JPEG", async () => {
 	expect(sut.extension()).toBe("jpg");
 });
 
+test("keeps the bytes it was read from", async () => {
+	const bytes = await sut.image(600, 300, "png");
+
+	await sut.read(bytes);
+
+	expect(sut.original()).toEqual(bytes);
+});
+
 test("names the extension of a PNG", async () => {
 	await sut.read(await sut.image(600, 300, "png"));
 
@@ -108,6 +116,10 @@ class SUT {
 
 	extension(): string {
 		return (this.picture as Picture).extension;
+	}
+
+	original(): Uint8Array {
+		return (this.picture as Picture).original();
 	}
 
 	async thumbnailShape(): Promise<object> {

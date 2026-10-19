@@ -25,7 +25,7 @@ test("lists nothing for a session without photos", async () => {
 test("fails to list when the session folder cannot be read", async () => {
 	await sut.blockFolderOf("s-1");
 
-	expect(sut.photosOf("s-1")).rejects.toThrow();
+	await expect(sut.photosOf("s-1")).rejects.toThrow();
 });
 
 test("lists the stored photos oldest first", async () => {
@@ -77,7 +77,7 @@ test("keeps photos after a restart", async () => {
 });
 
 test("refuses the thumbnail of an unknown photo", async () => {
-	expect(sut.thumbnailById("s-1", PhotoId.generate())).rejects.toThrow(
+	await expect(sut.thumbnailById("s-1", PhotoId.generate())).rejects.toThrow(
 		PhotoNotFoundError,
 	);
 });
@@ -85,7 +85,7 @@ test("refuses the thumbnail of an unknown photo", async () => {
 test("refuses the thumbnail of a photo to another session", async () => {
 	const photo = await sut.store("s-1", 50);
 
-	expect(sut.thumbnailById("s-2", photo.id)).rejects.toThrow(
+	await expect(sut.thumbnailById("s-2", photo.id)).rejects.toThrow(
 		PhotoNotFoundError,
 	);
 });

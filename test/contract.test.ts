@@ -1,6 +1,7 @@
 import { beforeAll, expect, test } from "bun:test";
 import { OperationRegistry } from "../src/operations/OperationRegistry.ts";
 import { PhotoStore } from "../src/photo/PhotoStore.ts";
+import { UserAlbumStore } from "../src/userAlbum/UserAlbumStore.ts";
 import { OpenApiRoutes } from "./OpenApiRoutes.ts";
 
 let sut: SUT;
@@ -32,6 +33,7 @@ class SUT {
 		const contract = await OpenApiRoutes.read("openapi.yaml");
 		const registered = OperationRegistry.standard(
 			new PhotoStore("data"),
+			new UserAlbumStore("data"),
 		).names();
 		return new SUT(contract.names, registered);
 	}

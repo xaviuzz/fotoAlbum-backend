@@ -5,6 +5,8 @@ import { InvalidBodyError } from "../call/InvalidBodyError.ts";
 import { InvalidCallError } from "../call/InvalidCallError.ts";
 import type { Reply } from "../call/Reply.ts";
 import { SessionRequiredError } from "../session/SessionRequiredError.ts";
+import { UserAlbumAlreadyExistsError } from "../userAlbum/UserAlbumAlreadyExistsError.ts";
+import { UserAlbumNotFoundError } from "../userAlbum/UserAlbumNotFoundError.ts";
 import type { Operation } from "./Operation.ts";
 
 export abstract class CallOperation implements Operation {
@@ -48,6 +50,12 @@ export abstract class CallOperation implements Operation {
 		}
 		if (error instanceof SessionRequiredError) {
 			answer = call.failure("SESSION_REQUIRED", error.message);
+		}
+		if (error instanceof UserAlbumAlreadyExistsError) {
+			answer = call.failure("USER_ALBUM_ALREADY_EXISTS", error.message);
+		}
+		if (error instanceof UserAlbumNotFoundError) {
+			answer = call.failure("USER_ALBUM_NOT_FOUND", error.message);
 		}
 		return answer;
 	}

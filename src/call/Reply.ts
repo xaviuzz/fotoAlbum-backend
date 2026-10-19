@@ -2,6 +2,8 @@ export type ErrorCode =
 	| "INVALID_BODY"
 	| "ALBUM_NOT_FOUND"
 	| "SESSION_REQUIRED"
+	| "USER_ALBUM_ALREADY_EXISTS"
+	| "USER_ALBUM_NOT_FOUND"
 	| "INTERNAL_ERROR";
 
 type Status = "ok" | "error";

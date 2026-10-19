@@ -72,6 +72,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransportError"
+  /userAlbum.create:
+    post:
+      operationId: userAlbumCreate
+      summary: Makes the user album of the session from a catalogue model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAlbumCreateCall"
+      responses:
+        "200":
+          description: ok, or an error carried in the message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAlbumCreateReply"
+        "400":
+          description: unreadable JSON or missing callId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransportError"
+  /userAlbum.get:
+    post:
+      operationId: userAlbumGet
+      summary: Answers the user album of the session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAlbumGetCall"
+      responses:
+        "200":
+          description: ok, or an error carried in the message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAlbumGetReply"
+        "400":
+          description: unreadable JSON or missing callId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransportError"
   /photo.list:
     post:
       operationId: photoList
@@ -185,7 +231,13 @@ components:
       properties:
         code:
           type: string
-          enum: [INVALID_BODY, ALBUM_NOT_FOUND, SESSION_REQUIRED, INTERNAL_ERROR]
+          enum:
+            - INVALID_BODY
+            - ALBUM_NOT_FOUND
+            - SESSION_REQUIRED
+            - USER_ALBUM_ALREADY_EXISTS
+            - USER_ALBUM_NOT_FOUND
+            - INTERNAL_ERROR
         message:
           type: string
     HealthCheckReply:
@@ -284,6 +336,78 @@ components:
               properties:
                 album:
                   $ref: "#/components/schemas/Album"
+            - $ref: "#/components/schemas/ErrorBody"
+    UserAlbum:
+      type: object
+      required: [id, reference, commercialName, albumSize, pageSize, pageCount, binding, orientation]
+      properties:
+        id:
+          type: string
+        reference:
+          type: string
+        commercialName:
+          type: string
+        albumSize:
+          $ref: "#/components/schemas/Size"
+        pageSize:
+          $ref: "#/components/schemas/Size"
+        pageCount:
+          type: integer
+          minimum: 2
+        binding:
+          type: string
+          enum: [hardcover, softcover]
+        orientation:
+          type: string
+          enum: [square, portrait, landscape]
+    UserAlbumCreateCall:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/CallHeader"
+        body:
+          type: object
+          required: [reference]
+          properties:
+            reference:
+              type: string
+              minLength: 1
+    UserAlbumCreateReply:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/ReplyHeader"
+        body:
+          oneOf:
+            - type: object
+              required: [userAlbum]
+              properties:
+                userAlbum:
+                  $ref: "#/components/schemas/UserAlbum"
+            - $ref: "#/components/schemas/ErrorBody"
+    UserAlbumGetCall:
+      type: object
+      required: [header]
+      properties:
+        header:
+          $ref: "#/components/schemas/CallHeader"
+        body:
+          type: object
+    UserAlbumGetReply:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/ReplyHeader"
+        body:
+          oneOf:
+            - type: object
+              required: [userAlbum]
+              properties:
+                userAlbum:
+                  $ref: "#/components/schemas/UserAlbum"
             - $ref: "#/components/schemas/ErrorBody"
     Photo:
       type: object

@@ -86,3 +86,27 @@ test("fails when the header has no session id", () => {
 
 	expect(() => call.requireSession()).toThrow(SessionRequiredError);
 });
+
+test("fails with the code of a call error", () => {
+	const raw = { header: { callId: "abc-1" } };
+	const call = Call.from(raw);
+
+	const reply = call.failureFrom(new SessionRequiredError("session required"));
+
+	expect(reply.toJSON()).toEqual({
+		header: { callId: "abc-1", status: "error" },
+		body: { code: "SESSION_REQUIRED", message: "session required" },
+	});
+});
+
+test("fails as internal error when the error is not a call error", () => {
+	const raw = { header: { callId: "abc-1" } };
+	const call = Call.from(raw);
+
+	const reply = call.failureFrom(new Error("boom"));
+
+	expect(reply.toJSON()).toEqual({
+		header: { callId: "abc-1", status: "error" },
+		body: { code: "INTERNAL_ERROR", message: "internal error" },
+	});
+});

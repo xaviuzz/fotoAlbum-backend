@@ -1,5 +1,6 @@
 import { SessionId } from "../session/SessionId.ts";
 import { Body } from "./Body.ts";
+import { CallError } from "./CallError.ts";
 import { InvalidCallError } from "./InvalidCallError.ts";
 import { type ErrorCode, Reply } from "./Reply.ts";
 
@@ -30,6 +31,14 @@ export class Call {
 
 	failure(code: ErrorCode, message: string): Reply {
 		return Reply.failure(this.callId, code, message);
+	}
+
+	failureFrom(error: unknown): Reply {
+		let reply = this.failure("INTERNAL_ERROR", "internal error");
+		if (error instanceof CallError) {
+			reply = this.failure(error.code, error.message);
+		}
+		return reply;
 	}
 
 	private static readCallId(message: Fields): string {

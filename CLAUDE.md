@@ -22,3 +22,5 @@ A change is done when test, lint, typecheck and build pass.
 ## Layout
 
 `test/` mirrors `src/`. Tests assert on public behavior.
+
+Every `expect(...).rejects` and `.resolves` is awaited. Bun waits for an unawaited one, but the `await` makes the check explicit instead of relying on the runner.

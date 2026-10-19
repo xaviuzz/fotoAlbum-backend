@@ -1,7 +1,6 @@
 import { beforeAll, expect, test } from "bun:test";
 import { OperationRegistry } from "../src/operations/OperationRegistry.ts";
-import { PhotoStore } from "../src/photo/PhotoStore.ts";
-import { UserAlbumStore } from "../src/userAlbum/UserAlbumStore.ts";
+import { Stores } from "../src/Stores.ts";
 import { OpenApiRoutes } from "./OpenApiRoutes.ts";
 
 let sut: SUT;
@@ -31,10 +30,7 @@ const SERVED_APART = ["photos/{sessionId}/{photoId}/thumbnail"];
 class SUT {
 	static async read(): Promise<SUT> {
 		const contract = await OpenApiRoutes.read("openapi.yaml");
-		const registered = OperationRegistry.standard(
-			new PhotoStore("data"),
-			new UserAlbumStore("data"),
-		).names();
+		const registered = OperationRegistry.standard(Stores.under("data")).names();
 		return new SUT(contract.names, registered);
 	}
 

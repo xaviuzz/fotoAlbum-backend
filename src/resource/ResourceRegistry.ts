@@ -1,13 +1,13 @@
-import type { PhotoStore } from "../photo/PhotoStore.ts";
 import { ThumbnailRoute } from "../photo/ThumbnailRoute.ts";
 import type { Routes } from "../Routes.ts";
+import type { Stores } from "../Stores.ts";
 import type { ResourceRoute } from "./ResourceRoute.ts";
 
 export class ResourceRegistry {
 	constructor(private readonly resources: ResourceRoute[]) {}
 
-	static standard(photoStore: PhotoStore): ResourceRegistry {
-		return new ResourceRegistry([new ThumbnailRoute(photoStore)]);
+	static standard(stores: Stores): ResourceRegistry {
+		return new ResourceRegistry([new ThumbnailRoute(stores.photos)]);
 	}
 
 	routes(): Routes {

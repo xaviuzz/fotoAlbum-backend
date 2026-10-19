@@ -1,7 +1,6 @@
 import { OperationRegistry } from "./operations/OperationRegistry.ts";
-import { PhotoStore } from "./photo/PhotoStore.ts";
 import { ResourceRegistry } from "./resource/ResourceRegistry.ts";
-import { UserAlbumStore } from "./userAlbum/UserAlbumStore.ts";
+import { Stores } from "./Stores.ts";
 
 const ONE_GIGABYTE = 1024 * 1024 * 1024;
 
@@ -9,10 +8,9 @@ export class Server {
 	private constructor(private readonly bunServer: Bun.Server<undefined>) {}
 
 	static start(port: number, dataDir: string): Server {
-		const photoStore = new PhotoStore(dataDir);
-		const userAlbumStore = new UserAlbumStore(dataDir);
-		const operations = OperationRegistry.standard(photoStore, userAlbumStore);
-		const resources = ResourceRegistry.standard(photoStore);
+		const stores = Stores.under(dataDir);
+		const operations = OperationRegistry.standard(stores);
+		const resources = ResourceRegistry.standard(stores);
 		const bunServer = Bun.serve({
 			port,
 			maxRequestBodySize: ONE_GIGABYTE,

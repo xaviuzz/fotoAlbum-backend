@@ -35,7 +35,10 @@ export class PhotoStore {
 		}
 		const photos: Photo[] = [];
 		for (const id of ids.sort()) {
-			photos.push(new Photo(id, sessionId));
+			const isPhoto = PHOTO_FOLDER_NAME.test(id);
+			if (isPhoto) {
+				photos.push(new Photo(id, sessionId));
+			}
 		}
 		return photos;
 	}

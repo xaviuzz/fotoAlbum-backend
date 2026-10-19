@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PhotoStore } from "../../src/photo/PhotoStore.ts";
@@ -25,6 +25,20 @@ test("lists the stored photos oldest first", async () => {
 	await sut.store("s-1", "third");
 
 	expect(await sut.thumbnailsOf("s-1")).toEqual(["first", "second", "third"]);
+});
+
+test("lists nothing for a session that only keeps a user album", async () => {
+	await sut.keepUserAlbum("s-1");
+
+	expect(await sut.photosOf("s-1")).toEqual([]);
+});
+
+test("lists only the photos of a session that also keeps a user album", async () => {
+	const photo = await sut.store("s-1", "first");
+	await sut.keepUserAlbum("s-1");
+
+	const photos = await sut.photosOf("s-1");
+	expect(photos.map((listed) => listed.id)).toEqual([photo.id]);
 });
 
 test("answers each photo with its thumbnail address", async () => {
@@ -90,6 +104,12 @@ class SUT {
 			thumbnail,
 		);
 		return photo;
+	}
+
+	async keepUserAlbum(session: string) {
+		const folder = SessionId.from(session).pathIn(this.root);
+		await mkdir(folder, { recursive: true });
+		await writeFile(join(folder, "user-album.json"), "{}");
 	}
 
 	async photosOf(session: string) {

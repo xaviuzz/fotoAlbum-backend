@@ -1,6 +1,7 @@
 import { beforeEach, expect, test } from "bun:test";
 import sharp from "sharp";
 import { Picture } from "../../src/photo/Picture.ts";
+import { TooLargeError } from "../../src/photo/TooLargeError.ts";
 import { UnreadableImageError } from "../../src/photo/UnreadableImageError.ts";
 import { UnsupportedFormatError } from "../../src/photo/UnsupportedFormatError.ts";
 
@@ -39,19 +40,25 @@ test("names the extension of a WebP", async () => {
 test("refuses an image of another format", async () => {
 	const gif = await sut.image(600, 300, "gif");
 
-	expect(sut.read(gif)).rejects.toThrow(UnsupportedFormatError);
+	await expect(sut.read(gif)).rejects.toThrow(UnsupportedFormatError);
 });
 
 test("refuses bytes that are not an image", async () => {
 	const text = new TextEncoder().encode("hello");
 
-	expect(sut.read(text)).rejects.toThrow(UnreadableImageError);
+	await expect(sut.read(text)).rejects.toThrow(UnreadableImageError);
 });
 
 test("refuses a damaged image", async () => {
 	const damaged = (await sut.image(600, 300, "jpeg")).slice(0, 100);
 
-	expect(sut.read(damaged)).rejects.toThrow(UnreadableImageError);
+	await expect(sut.read(damaged)).rejects.toThrow(UnreadableImageError);
+});
+
+test("refuses bytes over 25 MB", async () => {
+	const big = new Uint8Array(25 * 1024 * 1024 + 1);
+
+	await expect(sut.read(big)).rejects.toThrow(TooLargeError);
 });
 
 test("makes a JPEG thumbnail whose longest side is 256 pixels", async () => {

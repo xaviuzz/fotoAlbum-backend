@@ -2,17 +2,12 @@ import { Call } from "../../call/Call.ts";
 import { CallError } from "../../call/CallError.ts";
 import { InvalidBodyError } from "../../call/InvalidBodyError.ts";
 import type { Reply } from "../../call/Reply.ts";
-import type { Photo } from "../../photo/Photo.ts";
 import type { PhotoStore } from "../../photo/PhotoStore.ts";
 import { Picture } from "../../photo/Picture.ts";
-import { UnreadableImageError } from "../../photo/UnreadableImageError.ts";
-import { UnsupportedFormatError } from "../../photo/UnsupportedFormatError.ts";
+import { RefusalError } from "../../photo/RefusalError.ts";
+import { UploadOutcome } from "../../photo/UploadOutcome.ts";
 import type { SessionId } from "../../session/SessionId.ts";
 import type { Operation } from "../Operation.ts";
-
-const MAX_FILE_BYTES = 25 * 1024 * 1024;
-
-type RejectedFile = { name: string; code: string };
 
 export class PhotoUpload implements Operation {
 	readonly name = "photo.upload";
@@ -44,15 +39,11 @@ export class PhotoUpload implements Operation {
 		try {
 			const sessionId = call.requireSession();
 			const files = this.readFiles(form);
-			const photos: Photo[] = [];
-			const rejected: RejectedFile[] = [];
+			let outcome = UploadOutcome.empty();
 			for (const file of files) {
-				const code = await this.keepOrRefuse(sessionId, file, photos);
-				if (code !== undefined) {
-					rejected.push({ name: file.name, code });
-				}
+				outcome = await this.keepOrRefuse(sessionId, file, outcome);
 			}
-			reply = call.ok({ photos, rejected });
+			reply = call.ok(outcome);
 		} catch (error) {
 			reply = this.failureFor(call, error);
 		}
@@ -75,46 +66,29 @@ export class PhotoUpload implements Operation {
 	private async keepOrRefuse(
 		sessionId: SessionId,
 		file: File,
-		photos: Photo[],
-	): Promise<string | undefined> {
-		let refusal: string | undefined;
-		if (file.size > MAX_FILE_BYTES) {
-			refusal = "TOO_LARGE";
-		} else {
-			refusal = await this.keepReadable(sessionId, file, photos);
-		}
-		return refusal;
-	}
-
-	private async keepReadable(
-		sessionId: SessionId,
-		file: File,
-		photos: Photo[],
-	): Promise<string | undefined> {
-		let refusal: string | undefined;
+		outcome: UploadOutcome,
+	): Promise<UploadOutcome> {
+		let next: UploadOutcome;
 		try {
 			const bytes = await file.bytes();
 			const picture = await Picture.read(bytes);
 			const photo = await this.store.add(sessionId, picture);
-			photos.push(photo);
+			next = outcome.keep(photo);
 		} catch (error) {
-			refusal = this.refusalFor(error);
+			next = this.refuse(file, error, outcome);
 		}
-		return refusal;
+		return next;
 	}
 
-	private refusalFor(error: unknown): string {
-		let refusal: string | undefined;
-		if (error instanceof UnsupportedFormatError) {
-			refusal = "UNSUPPORTED_FORMAT";
-		}
-		if (error instanceof UnreadableImageError) {
-			refusal = "UNREADABLE_IMAGE";
-		}
-		if (refusal === undefined) {
+	private refuse(
+		file: File,
+		error: unknown,
+		outcome: UploadOutcome,
+	): UploadOutcome {
+		if (!(error instanceof RefusalError)) {
 			throw error;
 		}
-		return refusal;
+		return outcome.refuse(file.name, error);
 	}
 
 	private failureFor(call: Call, error: unknown): Reply {

@@ -1,6 +1,9 @@
 import sharp from "sharp";
+import { TooLargeError } from "./TooLargeError.ts";
 import { UnreadableImageError } from "./UnreadableImageError.ts";
 import { UnsupportedFormatError } from "./UnsupportedFormatError.ts";
+
+const MAX_BYTES = 25 * 1024 * 1024;
 
 const THUMBNAIL_SIDE = 256;
 
@@ -18,6 +21,7 @@ export class Picture {
 	) {}
 
 	static async read(bytes: Uint8Array): Promise<Picture> {
+		Picture.checkWeight(bytes);
 		const format = await Picture.readFormat(bytes);
 		const extension = Picture.extensionOf(format);
 		const thumbnail = await Picture.makeThumbnail(bytes);
@@ -30,6 +34,13 @@ export class Picture {
 
 	thumbnail(): Uint8Array {
 		return this.thumbnailBytes;
+	}
+
+	private static checkWeight(bytes: Uint8Array): void {
+		const isTooLarge = bytes.length > MAX_BYTES;
+		if (isTooLarge) {
+			throw new TooLargeError("over 25 MB");
+		}
 	}
 
 	private static async readFormat(bytes: Uint8Array): Promise<string> {

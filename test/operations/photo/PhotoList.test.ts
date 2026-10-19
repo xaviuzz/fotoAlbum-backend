@@ -77,7 +77,7 @@ class SUT {
 			{ bytes, extension: "jpg" },
 			bytes,
 		);
-		return photo.id;
+		return photo.id.toString();
 	}
 
 	async list(callId: string, session: string): Promise<void> {

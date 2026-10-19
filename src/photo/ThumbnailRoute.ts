@@ -1,8 +1,9 @@
-import { SessionId } from "../session/SessionId.ts";
 import { SessionRequiredError } from "../session/SessionRequiredError.ts";
+import { InvalidPhotoIdError } from "./InvalidPhotoIdError.ts";
+import { InvalidThumbnailUrlError } from "./InvalidThumbnailUrlError.ts";
 import type { PhotoStore } from "./PhotoStore.ts";
+import { ThumbnailUrl } from "./ThumbnailUrl.ts";
 
-const THUMBNAIL_PATH = /^\/photos\/([^/]+)\/([^/]+)\/thumbnail$/;
 const A_YEAR = 31536000;
 
 export class ThumbnailRoute {
@@ -11,34 +12,32 @@ export class ThumbnailRoute {
 	serves(request: Request): boolean {
 		const isGet = request.method === "GET";
 		const path = new URL(request.url).pathname;
-		const isThumbnailPath = THUMBNAIL_PATH.test(path);
+		const isThumbnailPath = ThumbnailUrl.matches(path);
 		return isGet && isThumbnailPath;
 	}
 
 	async serve(request: Request): Promise<Response> {
 		const path = new URL(request.url).pathname;
-		const match = THUMBNAIL_PATH.exec(path);
-		let response = new Response(null, { status: 404 });
-		if (match !== null) {
-			response = await this.thumbnail(match[1] as string, match[2] as string);
-		}
-		return response;
-	}
-
-	private async thumbnail(session: string, photoId: string): Promise<Response> {
 		let response = new Response(null, { status: 404 });
 		try {
-			const sessionId = SessionId.from(session);
-			const bytes = await this.store.thumbnailOf(sessionId, photoId);
+			const url = ThumbnailUrl.parse(path);
+			const bytes = await this.store.thumbnailOf(url.sessionId, url.photoId);
 			if (bytes !== undefined) {
 				response = this.jpeg(bytes);
 			}
 		} catch (error) {
-			if (!(error instanceof SessionRequiredError)) {
+			if (!this.isRefusal(error)) {
 				throw error;
 			}
 		}
 		return response;
+	}
+
+	private isRefusal(error: unknown): boolean {
+		const isBadSession = error instanceof SessionRequiredError;
+		const isBadPhoto = error instanceof InvalidPhotoIdError;
+		const isBadPath = error instanceof InvalidThumbnailUrlError;
+		return isBadSession || isBadPhoto || isBadPath;
 	}
 
 	private jpeg(bytes: Uint8Array<ArrayBuffer>): Response {

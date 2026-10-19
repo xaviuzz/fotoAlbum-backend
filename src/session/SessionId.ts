@@ -15,6 +15,10 @@ export class SessionId {
 		return new SessionId(raw);
 	}
 
+	toString(): string {
+		return this.code;
+	}
+
 	pathIn(root: string): string {
 		return join(root, this.code);
 	}

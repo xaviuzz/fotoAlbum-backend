@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { PhotoId } from "../../src/photo/PhotoId.ts";
 import { PhotoStore } from "../../src/photo/PhotoStore.ts";
 import { SessionId } from "../../src/session/SessionId.ts";
 
@@ -68,13 +69,7 @@ test("keeps photos after a restart", async () => {
 });
 
 test("gives no thumbnail for an unknown photo", async () => {
-	expect(await sut.thumbnailById("s-1", "nope")).toBeUndefined();
-});
-
-test("gives no thumbnail for an id that could leave its folder", async () => {
-	await sut.store("s-1", "first");
-
-	expect(await sut.thumbnailById("s-1", "../s-1")).toBeUndefined();
+	expect(await sut.thumbnailById("s-1", PhotoId.generate())).toBeUndefined();
 });
 
 test("gives no thumbnail of a photo to another session", async () => {
@@ -129,7 +124,7 @@ class SUT {
 
 	async thumbnailById(
 		session: string,
-		photoId: string,
+		photoId: PhotoId,
 	): Promise<string | undefined> {
 		const bytes = await this.photoStore.thumbnailOf(
 			SessionId.from(session),

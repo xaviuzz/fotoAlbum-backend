@@ -187,7 +187,7 @@ class SUT {
 
 	async storedPhotoIds(session: string): Promise<string[]> {
 		const photos = await this.store.list(SessionId.from(session));
-		return photos.map((photo) => photo.id);
+		return photos.map((photo) => photo.id.toString());
 	}
 
 	async discard(): Promise<void> {

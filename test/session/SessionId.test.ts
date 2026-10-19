@@ -36,3 +36,7 @@ test("rejects a code that could leave its folder", () => {
 	expect(() => SessionId.from("a/b")).toThrow(SessionRequiredError);
 	expect(() => SessionId.from("a b")).toThrow(SessionRequiredError);
 });
+
+test("answers its code as text", () => {
+	expect(SessionId.from("abc-123_X").toString()).toBe("abc-123_X");
+});

@@ -9,8 +9,6 @@ export class PhotoList extends CallOperation {
 		super();
 	}
 
-	protected validate(): void {}
-
 	protected async execute(call: Call): Promise<unknown> {
 		const sessionId = call.requireSession();
 		const photos = await this.store.list(sessionId);

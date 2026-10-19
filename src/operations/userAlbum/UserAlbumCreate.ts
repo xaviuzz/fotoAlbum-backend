@@ -1,5 +1,4 @@
 import type { Catalogue } from "../../album/Catalogue.ts";
-import type { Body } from "../../call/Body.ts";
 import type { Call } from "../../call/Call.ts";
 import { UserAlbum } from "../../userAlbum/UserAlbum.ts";
 import type { UserAlbumStore } from "../../userAlbum/UserAlbumStore.ts";
@@ -15,13 +14,9 @@ export class UserAlbumCreate extends CallOperation {
 		super();
 	}
 
-	protected validate(body: Body): void {
-		body.requireText("reference");
-	}
-
 	protected async execute(call: Call): Promise<unknown> {
-		const sessionId = call.requireSession();
 		const reference = call.body.requireText("reference");
+		const sessionId = call.requireSession();
 		const model = this.catalogue.find(reference);
 		const userAlbum = UserAlbum.from(model);
 		await this.store.save(sessionId, userAlbum);

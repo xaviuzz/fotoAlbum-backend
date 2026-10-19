@@ -9,8 +9,6 @@ export class UserAlbumGet extends CallOperation {
 		super();
 	}
 
-	protected validate(): void {}
-
 	protected async execute(call: Call): Promise<unknown> {
 		const sessionId = call.requireSession();
 		const userAlbum = await this.store.find(sessionId);

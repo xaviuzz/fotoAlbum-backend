@@ -8,8 +8,6 @@ export class AlbumList extends CallOperation {
 		super();
 	}
 
-	protected validate(): void {}
-
 	protected async execute(): Promise<unknown> {
 		const albums = this.catalogue.list();
 		return { albums };

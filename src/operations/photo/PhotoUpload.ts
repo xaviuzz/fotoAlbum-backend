@@ -1,4 +1,5 @@
 import { Call } from "../../call/Call.ts";
+import { CallError } from "../../call/CallError.ts";
 import { InvalidBodyError } from "../../call/InvalidBodyError.ts";
 import type { Reply } from "../../call/Reply.ts";
 import type { Photo } from "../../photo/Photo.ts";
@@ -7,7 +8,6 @@ import { Picture } from "../../photo/Picture.ts";
 import { UnreadableImageError } from "../../photo/UnreadableImageError.ts";
 import { UnsupportedFormatError } from "../../photo/UnsupportedFormatError.ts";
 import type { SessionId } from "../../session/SessionId.ts";
-import { SessionRequiredError } from "../../session/SessionRequiredError.ts";
 import type { Operation } from "../Operation.ts";
 
 const MAX_FILE_BYTES = 25 * 1024 * 1024;
@@ -124,11 +124,8 @@ export class PhotoUpload implements Operation {
 
 	private failureFor(call: Call, error: unknown): Reply {
 		let reply = call.failure("INTERNAL_ERROR", "internal error");
-		if (error instanceof InvalidBodyError) {
-			reply = call.failure("INVALID_BODY", error.message);
-		}
-		if (error instanceof SessionRequiredError) {
-			reply = call.failure("SESSION_REQUIRED", error.message);
+		if (error instanceof CallError) {
+			reply = call.failure(error.code, error.message);
 		}
 		return reply;
 	}

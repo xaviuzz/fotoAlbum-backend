@@ -1,18 +1,11 @@
-import { AlbumNotFoundError } from "../album/AlbumNotFoundError.ts";
-import type { Body } from "../call/Body.ts";
 import { Call } from "../call/Call.ts";
-import { InvalidBodyError } from "../call/InvalidBodyError.ts";
+import { CallError } from "../call/CallError.ts";
 import { InvalidCallError } from "../call/InvalidCallError.ts";
 import type { Reply } from "../call/Reply.ts";
-import { SessionRequiredError } from "../session/SessionRequiredError.ts";
-import { UserAlbumAlreadyExistsError } from "../userAlbum/UserAlbumAlreadyExistsError.ts";
-import { UserAlbumNotFoundError } from "../userAlbum/UserAlbumNotFoundError.ts";
 import type { Operation } from "./Operation.ts";
 
 export abstract class CallOperation implements Operation {
 	abstract readonly name: string;
-
-	protected abstract validate(body: Body): void;
 
 	protected abstract execute(call: Call): Promise<unknown>;
 
@@ -31,7 +24,6 @@ export abstract class CallOperation implements Operation {
 	private async answer(call: Call): Promise<Reply> {
 		let answer: Reply;
 		try {
-			this.validate(call.body);
 			const result = await this.execute(call);
 			answer = call.ok(result);
 		} catch (error) {
@@ -42,20 +34,8 @@ export abstract class CallOperation implements Operation {
 
 	private failureFor(call: Call, error: unknown): Reply {
 		let answer = call.failure("INTERNAL_ERROR", "internal error");
-		if (error instanceof InvalidBodyError) {
-			answer = call.failure("INVALID_BODY", error.message);
-		}
-		if (error instanceof AlbumNotFoundError) {
-			answer = call.failure("ALBUM_NOT_FOUND", error.message);
-		}
-		if (error instanceof SessionRequiredError) {
-			answer = call.failure("SESSION_REQUIRED", error.message);
-		}
-		if (error instanceof UserAlbumAlreadyExistsError) {
-			answer = call.failure("USER_ALBUM_ALREADY_EXISTS", error.message);
-		}
-		if (error instanceof UserAlbumNotFoundError) {
-			answer = call.failure("USER_ALBUM_NOT_FOUND", error.message);
+		if (error instanceof CallError) {
+			answer = call.failure(error.code, error.message);
 		}
 		return answer;
 	}

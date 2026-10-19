@@ -1,6 +1,7 @@
 import { beforeEach, expect, test } from "bun:test";
 import { Catalogue } from "../../../src/album/Catalogue.ts";
 import { AlbumList } from "../../../src/operations/album/AlbumList.ts";
+import { JsonOperation } from "../../../src/operations/JsonOperation.ts";
 
 let sut: SUT;
 
@@ -27,7 +28,9 @@ test("answers each album with its orientation", async () => {
 });
 
 class SUT {
-	private readonly operation = new AlbumList(Catalogue.seeded());
+	private readonly operation = new JsonOperation(
+		new AlbumList(Catalogue.seeded()),
+	);
 	private response = new Response();
 
 	async list(callId: string): Promise<void> {

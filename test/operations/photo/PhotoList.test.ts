@@ -2,6 +2,8 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { JsonOperation } from "../../../src/operations/JsonOperation.ts";
+import type { Operation } from "../../../src/operations/Operation.ts";
 import { PhotoList } from "../../../src/operations/photo/PhotoList.ts";
 import { PhotoStore } from "../../../src/photo/PhotoStore.ts";
 import { SessionId } from "../../../src/session/SessionId.ts";
@@ -63,12 +65,12 @@ class SUT {
 	}
 
 	private readonly store: PhotoStore;
-	private readonly operation: PhotoList;
+	private readonly operation: Operation;
 	private response = new Response();
 
 	private constructor(private readonly root: string) {
 		this.store = new PhotoStore(root);
-		this.operation = new PhotoList(this.store);
+		this.operation = new JsonOperation(new PhotoList(this.store));
 	}
 
 	async keepPhoto(session: string): Promise<string> {

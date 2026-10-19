@@ -1,5 +1,6 @@
 import { beforeEach, expect, test } from "bun:test";
 import { HealthCheck } from "../../../src/operations/health/HealthCheck.ts";
+import { JsonOperation } from "../../../src/operations/JsonOperation.ts";
 
 let sut: SUT;
 
@@ -22,7 +23,7 @@ test("is named health.check", () => {
 });
 
 class SUT {
-	private readonly operation = new HealthCheck();
+	private readonly operation = new JsonOperation(new HealthCheck());
 	private response = new Response();
 
 	async check(callId: string): Promise<void> {

@@ -1,7 +1,7 @@
 import { beforeEach, expect, test } from "bun:test";
 import { AlbumNotFoundError } from "../../src/album/AlbumNotFoundError.ts";
 import type { Call } from "../../src/call/Call.ts";
-import { CallOperation } from "../../src/operations/CallOperation.ts";
+import { JsonTransport } from "../../src/transport/JsonTransport.ts";
 
 let sut: SUT;
 
@@ -62,6 +62,7 @@ test("answers 200 ALBUM_NOT_FOUND when the album is not found", async () => {
 });
 
 class SUT {
+	private readonly transport = new JsonTransport();
 	private readonly operation = new EchoOperation();
 	private response = new Response();
 
@@ -93,14 +94,14 @@ class SUT {
 			method: "POST",
 			body: payload,
 		});
-		this.response = await this.operation.serve(request);
+		this.response = await this.transport.serve(request, this.operation);
 	}
 }
 
-class EchoOperation extends CallOperation {
+class EchoOperation {
 	readonly name = "test.echo";
 
-	protected async execute(call: Call): Promise<unknown> {
+	async execute(call: Call): Promise<unknown> {
 		const text = call.body.requireText("text");
 		if (text === "crash") {
 			throw new Error("boom");

@@ -3,6 +3,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import sharp from "sharp";
+import { MultipartOperation } from "../../../src/operations/MultipartOperation.ts";
+import type { Operation } from "../../../src/operations/Operation.ts";
 import { PhotoUpload } from "../../../src/operations/photo/PhotoUpload.ts";
 import { PhotoStore } from "../../../src/photo/PhotoStore.ts";
 import { SessionId } from "../../../src/session/SessionId.ts";
@@ -98,13 +100,13 @@ class SUT {
 	}
 
 	private readonly store: PhotoStore;
-	private readonly operation: PhotoUpload;
+	private readonly operation: Operation;
 	private readonly files: File[] = [];
 	private response = new Response();
 
 	private constructor(private readonly root: string) {
 		this.store = new PhotoStore(root);
-		this.operation = new PhotoUpload(this.store);
+		this.operation = new MultipartOperation(new PhotoUpload(this.store));
 	}
 
 	async attachImage(

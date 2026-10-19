@@ -1,6 +1,7 @@
 import { beforeEach, expect, test } from "bun:test";
 import { Catalogue } from "../../../src/album/Catalogue.ts";
 import { AlbumGet } from "../../../src/operations/album/AlbumGet.ts";
+import { JsonOperation } from "../../../src/operations/JsonOperation.ts";
 
 let sut: SUT;
 
@@ -61,7 +62,9 @@ test("answers INVALID_BODY when the reference is missing", async () => {
 });
 
 class SUT {
-	private readonly operation = new AlbumGet(Catalogue.seeded());
+	private readonly operation = new JsonOperation(
+		new AlbumGet(Catalogue.seeded()),
+	);
 	private response = new Response();
 
 	async get(callId: string, body: object): Promise<void> {

@@ -1,15 +1,13 @@
 import type { Call } from "../../call/Call.ts";
 import type { PhotoStore } from "../../photo/PhotoStore.ts";
-import { CallOperation } from "../CallOperation.ts";
+import type { JsonHandler } from "../../transport/JsonTransport.ts";
 
-export class PhotoList extends CallOperation {
+export class PhotoList implements JsonHandler {
 	readonly name = "photo.list";
 
-	constructor(private readonly store: PhotoStore) {
-		super();
-	}
+	constructor(private readonly store: PhotoStore) {}
 
-	protected async execute(call: Call): Promise<unknown> {
+	async execute(call: Call): Promise<unknown> {
 		const sessionId = call.requireSession();
 		const photos = await this.store.list(sessionId);
 		return { photos };

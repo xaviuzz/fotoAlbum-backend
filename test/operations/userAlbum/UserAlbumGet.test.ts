@@ -3,6 +3,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Catalogue } from "../../../src/album/Catalogue.ts";
+import { JsonOperation } from "../../../src/operations/JsonOperation.ts";
+import type { Operation } from "../../../src/operations/Operation.ts";
 import { UserAlbumCreate } from "../../../src/operations/userAlbum/UserAlbumCreate.ts";
 import { UserAlbumGet } from "../../../src/operations/userAlbum/UserAlbumGet.ts";
 import { UserAlbumStore } from "../../../src/userAlbum/UserAlbumStore.ts";
@@ -55,15 +57,17 @@ class SUT {
 		return new SUT(root);
 	}
 
-	private readonly creation: UserAlbumCreate;
-	private readonly operation: UserAlbumGet;
+	private readonly creation: Operation;
+	private readonly operation: Operation;
 	private response = new Response();
 	private createdAlbum: unknown;
 
 	private constructor(private readonly root: string) {
 		const store = new UserAlbumStore(root);
-		this.creation = new UserAlbumCreate(Catalogue.seeded(), store);
-		this.operation = new UserAlbumGet(store);
+		this.creation = new JsonOperation(
+			new UserAlbumCreate(Catalogue.seeded(), store),
+		);
+		this.operation = new JsonOperation(new UserAlbumGet(store));
 	}
 
 	async createFor(session: string, reference: string): Promise<void> {

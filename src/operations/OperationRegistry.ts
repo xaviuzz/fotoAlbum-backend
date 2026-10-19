@@ -4,6 +4,8 @@ import type { UserAlbumStore } from "../userAlbum/UserAlbumStore.ts";
 import { AlbumGet } from "./album/AlbumGet.ts";
 import { AlbumList } from "./album/AlbumList.ts";
 import { HealthCheck } from "./health/HealthCheck.ts";
+import { JsonOperation } from "./JsonOperation.ts";
+import { MultipartOperation } from "./MultipartOperation.ts";
 import { NoOperation } from "./NoOperation.ts";
 import type { Operation } from "./Operation.ts";
 import { PhotoList } from "./photo/PhotoList.ts";
@@ -26,13 +28,13 @@ export class OperationRegistry {
 	): OperationRegistry {
 		const catalogue = Catalogue.seeded();
 		return new OperationRegistry([
-			new HealthCheck(),
-			new AlbumList(catalogue),
-			new AlbumGet(catalogue),
-			new PhotoList(photoStore),
-			new PhotoUpload(photoStore),
-			new UserAlbumCreate(catalogue, userAlbumStore),
-			new UserAlbumGet(userAlbumStore),
+			new JsonOperation(new HealthCheck()),
+			new JsonOperation(new AlbumList(catalogue)),
+			new JsonOperation(new AlbumGet(catalogue)),
+			new JsonOperation(new PhotoList(photoStore)),
+			new MultipartOperation(new PhotoUpload(photoStore)),
+			new JsonOperation(new UserAlbumCreate(catalogue, userAlbumStore)),
+			new JsonOperation(new UserAlbumGet(userAlbumStore)),
 		]);
 	}
 

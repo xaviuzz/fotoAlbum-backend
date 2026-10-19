@@ -23,4 +23,6 @@ A change is done when test, lint, typecheck and build pass.
 
 `test/` mirrors `src/`. Tests assert on public behavior.
 
+Imports point inward: `domain/` imports nothing outside itself; `infrastructure/` imports `domain/`; `call/`, `operations/` and `resources/` import all three, never the reverse. A new class goes in the folder its dependencies allow. Why: `.claude/decisions/domain-has-its-own-folder-one-per-concept.md`.
+
 Every `expect(...).rejects` and `.resolves` is awaited. Bun waits for an unawaited one, but the `await` makes the check explicit instead of relying on the runner.

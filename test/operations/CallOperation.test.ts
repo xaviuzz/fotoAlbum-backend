@@ -1,6 +1,7 @@
 import { beforeEach, expect, test } from "bun:test";
 import { AlbumNotFoundError } from "../../src/album/AlbumNotFoundError.ts";
 import type { Body } from "../../src/call/Body.ts";
+import type { Call } from "../../src/call/Call.ts";
 import { CallOperation } from "../../src/operations/CallOperation.ts";
 
 let sut: SUT;
@@ -104,8 +105,8 @@ class EchoOperation extends CallOperation {
 		body.requireText("text");
 	}
 
-	protected async execute(body: Body): Promise<unknown> {
-		const text = body.requireText("text");
+	protected async execute(call: Call): Promise<unknown> {
+		const text = call.body.requireText("text");
 		if (text === "crash") {
 			throw new Error("boom");
 		}

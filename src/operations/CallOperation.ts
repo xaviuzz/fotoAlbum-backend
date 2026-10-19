@@ -4,6 +4,7 @@ import { Call } from "../call/Call.ts";
 import { InvalidBodyError } from "../call/InvalidBodyError.ts";
 import { InvalidCallError } from "../call/InvalidCallError.ts";
 import type { Reply } from "../call/Reply.ts";
+import { SessionRequiredError } from "../session/SessionRequiredError.ts";
 import type { Operation } from "./Operation.ts";
 
 export abstract class CallOperation implements Operation {
@@ -11,7 +12,7 @@ export abstract class CallOperation implements Operation {
 
 	protected abstract validate(body: Body): void;
 
-	protected abstract execute(body: Body): Promise<unknown>;
+	protected abstract execute(call: Call): Promise<unknown>;
 
 	async serve(request: Request): Promise<Response> {
 		let call: Call;
@@ -29,7 +30,7 @@ export abstract class CallOperation implements Operation {
 		let answer: Reply;
 		try {
 			this.validate(call.body);
-			const result = await this.execute(call.body);
+			const result = await this.execute(call);
 			answer = call.ok(result);
 		} catch (error) {
 			answer = this.failureFor(call, error);
@@ -44,6 +45,9 @@ export abstract class CallOperation implements Operation {
 		}
 		if (error instanceof AlbumNotFoundError) {
 			answer = call.failure("ALBUM_NOT_FOUND", error.message);
+		}
+		if (error instanceof SessionRequiredError) {
+			answer = call.failure("SESSION_REQUIRED", error.message);
 		}
 		return answer;
 	}

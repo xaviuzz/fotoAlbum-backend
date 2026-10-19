@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import { Call } from "../../src/call/Call.ts";
 import { InvalidBodyError } from "../../src/call/InvalidBodyError.ts";
 import { InvalidCallError } from "../../src/call/InvalidCallError.ts";
+import { SessionRequiredError } from "../../src/session/SessionRequiredError.ts";
 
 test("reads the body", () => {
 	const raw = { header: { callId: "abc-1" }, body: { name: "x" } };
@@ -68,4 +69,20 @@ test("fails with its call id", () => {
 		header: { callId: "abc-1", status: "error" },
 		body: { code: "INVALID_BODY", message: "bad" },
 	});
+});
+
+test("requires the session id of its header", () => {
+	const raw = { header: { callId: "abc-1", sessionId: "s-1" } };
+
+	const call = Call.from(raw);
+
+	expect(call.requireSession().pathIn("/data")).toBe("/data/s-1");
+});
+
+test("fails when the header has no session id", () => {
+	const raw = { header: { callId: "abc-1" } };
+
+	const call = Call.from(raw);
+
+	expect(() => call.requireSession()).toThrow(SessionRequiredError);
 });

@@ -1,5 +1,6 @@
 import type { Catalogue } from "../../album/Catalogue.ts";
 import type { Body } from "../../call/Body.ts";
+import type { Call } from "../../call/Call.ts";
 import { CallOperation } from "../CallOperation.ts";
 
 export class AlbumGet extends CallOperation {
@@ -13,8 +14,8 @@ export class AlbumGet extends CallOperation {
 		body.requireText("reference");
 	}
 
-	protected async execute(body: Body): Promise<unknown> {
-		const reference = body.requireText("reference");
+	protected async execute(call: Call): Promise<unknown> {
+		const reference = call.body.requireText("reference");
 		const album = this.catalogue.find(reference);
 		return { album };
 	}

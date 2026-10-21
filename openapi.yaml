@@ -165,6 +165,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransportError"
+  /slot.place:
+    post:
+      operationId: slotPlace
+      summary: Places a photo of the session in the slot of a face, replacing the previous one
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SlotPlaceCall"
+      responses:
+        "200":
+          description: ok, or an error carried in the message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SlotPlaceReply"
+        "400":
+          description: unreadable JSON or missing callId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransportError"
+  /slot.empty:
+    post:
+      operationId: slotEmpty
+      summary: Empties the slot of a face
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SlotEmptyCall"
+      responses:
+        "200":
+          description: ok, or an error carried in the message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SlotEmptyReply"
+        "400":
+          description: unreadable JSON or missing callId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransportError"
   /photos/{sessionId}/{photoId}/thumbnail:
     get:
       operationId: photoThumbnail
@@ -237,6 +283,8 @@ components:
             - SESSION_REQUIRED
             - USER_ALBUM_ALREADY_EXISTS
             - USER_ALBUM_NOT_FOUND
+            - FACE_NOT_FOUND
+            - PHOTO_NOT_FOUND
             - INTERNAL_ERROR
         message:
           type: string
@@ -337,10 +385,24 @@ components:
                 album:
                   $ref: "#/components/schemas/Album"
             - $ref: "#/components/schemas/ErrorBody"
+    Slot:
+      type: object
+      required: [face, photoId]
+      properties:
+        face:
+          type: integer
+          minimum: 1
+        photoId:
+          type: string
+          nullable: true
     UserAlbum:
       type: object
-      required: [id, reference, commercialName, albumSize, pageSize, pageCount, binding, orientation]
+      required: [id, reference, commercialName, albumSize, pageSize, pageCount, binding, orientation, slots]
       properties:
+        slots:
+          type: array
+          items:
+            $ref: "#/components/schemas/Slot"
         id:
           type: string
         reference:
@@ -396,6 +458,63 @@ components:
         body:
           type: object
     UserAlbumGetReply:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/ReplyHeader"
+        body:
+          oneOf:
+            - type: object
+              required: [userAlbum]
+              properties:
+                userAlbum:
+                  $ref: "#/components/schemas/UserAlbum"
+            - $ref: "#/components/schemas/ErrorBody"
+    SlotPlaceCall:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/CallHeader"
+        body:
+          type: object
+          required: [face, photoId]
+          properties:
+            face:
+              type: integer
+              minimum: 1
+            photoId:
+              type: string
+              minLength: 1
+    SlotPlaceReply:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/ReplyHeader"
+        body:
+          oneOf:
+            - type: object
+              required: [userAlbum]
+              properties:
+                userAlbum:
+                  $ref: "#/components/schemas/UserAlbum"
+            - $ref: "#/components/schemas/ErrorBody"
+    SlotEmptyCall:
+      type: object
+      required: [header, body]
+      properties:
+        header:
+          $ref: "#/components/schemas/CallHeader"
+        body:
+          type: object
+          required: [face]
+          properties:
+            face:
+              type: integer
+              minimum: 1
+    SlotEmptyReply:
       type: object
       required: [header, body]
       properties:

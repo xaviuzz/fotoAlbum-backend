@@ -15,8 +15,9 @@ export class Call {
 
 	static from(raw: unknown): Call {
 		const message = Call.asRecord(raw, "call must be an object");
-		const callId = Call.readCallId(message);
-		const sessionCode = Call.readSessionCode(message);
+		const header = Call.readHeader(message);
+		const callId = Call.readCallId(header);
+		const sessionCode = Call.readSessionCode(header);
 		const body = Call.readBody(message);
 		return new Call(callId, sessionCode, body);
 	}
@@ -41,8 +42,11 @@ export class Call {
 		return reply;
 	}
 
-	private static readCallId(message: Fields): string {
-		const header = Call.asRecord(message.header, "header must be an object");
+	private static readHeader(message: Fields): Fields {
+		return Call.asRecord(message.header, "header must be an object");
+	}
+
+	private static readCallId(header: Fields): string {
 		const callId = header.callId;
 		const isText = typeof callId === "string";
 		const isPresent = isText && callId.length > 0;
@@ -52,8 +56,7 @@ export class Call {
 		return callId;
 	}
 
-	private static readSessionCode(message: Fields): unknown {
-		const header = message.header as Fields;
+	private static readSessionCode(header: Fields): unknown {
 		return header.sessionId;
 	}
 

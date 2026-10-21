@@ -1,8 +1,7 @@
+import { Binding } from "./Binding.ts";
 import { InvalidAlbumError } from "./InvalidAlbumError.ts";
 import { Reference } from "./Reference.ts";
 import { type Orientation, Size } from "./Size.ts";
-
-const BINDINGS = ["hardcover", "softcover"];
 
 type Measures = { width: number; height: number };
 
@@ -15,15 +14,7 @@ export type AlbumData = {
 	binding: string;
 };
 
-type AlbumDescription = {
-	reference: string;
-	commercialName: string;
-	albumSize: Measures;
-	pageSize: Measures;
-	pageCount: number;
-	binding: string;
-	orientation: Orientation;
-};
+type AlbumDescription = AlbumData & { orientation: Orientation };
 
 export class Album {
 	private constructor(
@@ -32,24 +23,24 @@ export class Album {
 		private readonly albumSize: Size,
 		private readonly pageSize: Size,
 		private readonly pageCount: number,
-		private readonly binding: string,
+		private readonly binding: Binding,
 	) {}
 
 	static of(data: AlbumData): Album {
 		const reference = Reference.of(data.reference);
 		const albumSize = Size.of(data.albumSize.width, data.albumSize.height);
 		const pageSize = Size.of(data.pageSize.width, data.pageSize.height);
+		const binding = Binding.of(data.binding);
 		Album.requireCommercialName(data.commercialName);
 		Album.requirePageFitting(pageSize, albumSize);
 		Album.requireEvenPageCount(data.pageCount);
-		Album.requireKnownBinding(data.binding);
 		return new Album(
 			reference,
 			data.commercialName,
 			albumSize,
 			pageSize,
 			data.pageCount,
-			data.binding,
+			binding,
 		);
 	}
 
@@ -64,7 +55,7 @@ export class Album {
 			albumSize: this.albumSize.toJSON(),
 			pageSize: this.pageSize.toJSON(),
 			pageCount: this.pageCount,
-			binding: this.binding,
+			binding: this.binding.toString(),
 			orientation: this.albumSize.orientation(),
 		};
 	}
@@ -87,12 +78,6 @@ export class Album {
 		const isEven = pageCount % 2 === 0;
 		if (!isWhole || !isPositive || !isEven) {
 			throw new InvalidAlbumError("page count must be even and above zero");
-		}
-	}
-
-	private static requireKnownBinding(binding: string): void {
-		if (!BINDINGS.includes(binding)) {
-			throw new InvalidAlbumError("binding is hardcover or softcover");
 		}
 	}
 }

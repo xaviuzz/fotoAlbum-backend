@@ -23,6 +23,15 @@ export class UserAlbumStore {
 		}
 	}
 
+	async update(sessionId: SessionId, userAlbum: UserAlbum): Promise<void> {
+		const path = join(sessionId.pathIn(this.root), FILE_NAME);
+		const exists = await Bun.file(path).exists();
+		if (!exists) {
+			throw new UserAlbumNotFoundError("user album not found");
+		}
+		await writeFile(path, JSON.stringify(userAlbum));
+	}
+
 	async find(sessionId: SessionId): Promise<UserAlbum> {
 		const file = Bun.file(join(sessionId.pathIn(this.root), FILE_NAME));
 		const exists = await file.exists();

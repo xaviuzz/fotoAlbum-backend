@@ -90,6 +90,26 @@ test("refuses the thumbnail of a photo to another session", async () => {
 	);
 });
 
+test("finds a photo it stored", async () => {
+	const photo = await sut.store("s-1", 50);
+
+	expect(await sut.foundId("s-1", photo.id)).toBe(photo.id.toString());
+});
+
+test("refuses to find an unknown photo", async () => {
+	await expect(sut.foundId("s-1", PhotoId.generate())).rejects.toThrow(
+		PhotoNotFoundError,
+	);
+});
+
+test("refuses to find a photo of another session", async () => {
+	const photo = await sut.store("s-1", 50);
+
+	await expect(sut.foundId("s-2", photo.id)).rejects.toThrow(
+		PhotoNotFoundError,
+	);
+});
+
 class SUT {
 	static async create(): Promise<SUT> {
 		const root = await mkdtemp(join(tmpdir(), "photo-store-"));
@@ -133,6 +153,11 @@ class SUT {
 			shades.push(this.shadesByThumbnail.get(this.keyOf(thumbnail)) as number);
 		}
 		return shades;
+	}
+
+	async foundId(session: string, photoId: PhotoId): Promise<string> {
+		const photo = await this.photoStore.find(SessionId.from(session), photoId);
+		return photo.id.toString();
 	}
 
 	async thumbnailById(session: string, photoId: PhotoId): Promise<Uint8Array> {

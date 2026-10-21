@@ -4,6 +4,8 @@ export type ErrorCode =
 	| "SESSION_REQUIRED"
 	| "USER_ALBUM_ALREADY_EXISTS"
 	| "USER_ALBUM_NOT_FOUND"
+	| "FACE_NOT_FOUND"
+	| "PHOTO_NOT_FOUND"
 	| "INTERNAL_ERROR";
 
 type Status = "ok" | "error";

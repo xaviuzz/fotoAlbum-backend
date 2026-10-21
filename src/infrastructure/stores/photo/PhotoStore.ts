@@ -41,6 +41,11 @@ export class PhotoStore {
 		return photos;
 	}
 
+	async find(sessionId: SessionId, photoId: PhotoId): Promise<Photo> {
+		await this.thumbnailOf(sessionId, photoId);
+		return new Photo(photoId, sessionId);
+	}
+
 	async thumbnailOf(
 		sessionId: SessionId,
 		photoId: PhotoId,

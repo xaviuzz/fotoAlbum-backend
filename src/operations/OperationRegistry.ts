@@ -9,6 +9,8 @@ import { MultipartOperation } from "./MultipartOperation.ts";
 import type { Operation } from "./Operation.ts";
 import { PhotoList } from "./photo/PhotoList.ts";
 import { PhotoUpload } from "./photo/PhotoUpload.ts";
+import { SlotEmpty } from "./slot/SlotEmpty.ts";
+import { SlotPlace } from "./slot/SlotPlace.ts";
 import { UserAlbumCreate } from "./userAlbum/UserAlbumCreate.ts";
 import { UserAlbumGet } from "./userAlbum/UserAlbumGet.ts";
 
@@ -31,6 +33,8 @@ export class OperationRegistry {
 			new MultipartOperation(new PhotoUpload(stores.photos)),
 			new JsonOperation(new UserAlbumCreate(catalogue, stores.userAlbums)),
 			new JsonOperation(new UserAlbumGet(stores.userAlbums)),
+			new JsonOperation(new SlotPlace(stores.userAlbums, stores.photos)),
+			new JsonOperation(new SlotEmpty(stores.userAlbums)),
 		]);
 	}
 

@@ -21,6 +21,24 @@ test("rejects a field that is not text", () => {
 	expect(() => body.requireText("name")).toThrow(InvalidBodyError);
 });
 
+test("reads a required number field", () => {
+	const body = Body.from({ face: 3 });
+
+	expect(body.requireNumber("face")).toBe(3);
+});
+
+test("rejects a missing number field", () => {
+	const body = Body.empty();
+
+	expect(() => body.requireNumber("face")).toThrow(InvalidBodyError);
+});
+
+test("rejects a field that is not a number", () => {
+	const body = Body.from({ face: "3" });
+
+	expect(() => body.requireNumber("face")).toThrow(InvalidBodyError);
+});
+
 test("names the missing field in the problem", () => {
 	const body = Body.empty();
 

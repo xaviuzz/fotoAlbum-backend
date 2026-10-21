@@ -18,6 +18,14 @@ export class Body {
 		return new Body(raw as Fields);
 	}
 
+	requireNumber(field: string): number {
+		const value = this.fields[field];
+		if (typeof value !== "number") {
+			throw new InvalidBodyError(`${field} is required`);
+		}
+		return value;
+	}
+
 	requireText(field: string): string {
 		const value = this.fields[field];
 		if (typeof value !== "string") {

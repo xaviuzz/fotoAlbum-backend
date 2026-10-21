@@ -3,6 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Album } from "../../../../src/domain/album/Album.ts";
+import { PhotoId } from "../../../../src/domain/photo/PhotoId.ts";
 import { SessionId } from "../../../../src/domain/session/SessionId.ts";
 import { UserAlbum } from "../../../../src/domain/userAlbum/UserAlbum.ts";
 import { UserAlbumAlreadyExistsError } from "../../../../src/infrastructure/stores/userAlbum/UserAlbumAlreadyExistsError.ts";
@@ -57,6 +58,35 @@ test("keeps the first user album when a second save is refused", async () => {
 	expect(await sut.found("s-1")).toEqual(first);
 });
 
+test("finds the slots it updated", async () => {
+	await sut.save("s-1");
+
+	await sut.updateWithPhotoOnFace("s-1", 2);
+
+	expect(await sut.found("s-1")).toEqual(sut.saved());
+});
+
+test("keeps the updated slots after a new store instance", async () => {
+	await sut.save("s-1");
+	await sut.updateWithPhotoOnFace("s-1", 2);
+	sut.restart();
+
+	expect(await sut.found("s-1")).toEqual(sut.saved());
+});
+
+test("does not update a user album that was never saved", async () => {
+	await expect(sut.updateWithPhotoOnFace("s-1", 2)).rejects.toThrow(
+		UserAlbumNotFoundError,
+	);
+});
+
+test("reads a stored file without slots as every slot empty", async () => {
+	await sut.save("s-1");
+	await sut.rewriteWithoutSlots("s-1");
+
+	expect(await sut.found("s-1")).toEqual(sut.saved());
+});
+
 class SUT {
 	static async create(): Promise<SUT> {
 		const root = await mkdtemp(join(tmpdir(), "user-album-store-"));
@@ -73,6 +103,19 @@ class SUT {
 	async save(session: string): Promise<void> {
 		this.lastSaved = UserAlbum.from(this.model());
 		await this.store.save(SessionId.from(session), this.lastSaved);
+	}
+
+	async updateWithPhotoOnFace(session: string, face: number): Promise<void> {
+		const photoId = PhotoId.from("00000000-0000-0000-0000-00000000000a");
+		const base = this.lastSaved ?? UserAlbum.from(this.model());
+		this.lastSaved = base.place(face, photoId);
+		await this.store.update(SessionId.from(session), this.lastSaved);
+	}
+
+	async rewriteWithoutSlots(session: string): Promise<void> {
+		const file = join(this.root, session, "user-album.json");
+		const { slots, ...stored } = await Bun.file(file).json();
+		await Bun.write(file, JSON.stringify(stored));
 	}
 
 	saved(): unknown {

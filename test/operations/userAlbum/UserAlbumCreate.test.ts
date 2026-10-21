@@ -38,6 +38,16 @@ test("answers a user album copied from the model", async () => {
 	});
 });
 
+test("answers one empty slot for each face", async () => {
+	await sut.create("c-1b", "s-1", "PT-150");
+
+	const slots = ((await sut.userAlbum()) as { slots: unknown[] }).slots;
+
+	expect(slots).toHaveLength(20);
+	expect(slots[0]).toEqual({ face: 1, photoId: null });
+	expect(slots[19]).toEqual({ face: 20, photoId: null });
+});
+
 test("keeps the user album for the session", async () => {
 	await sut.create("c-2", "s-1", "PT-150");
 

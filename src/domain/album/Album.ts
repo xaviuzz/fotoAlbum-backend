@@ -48,6 +48,10 @@ export class Album {
 		return this.reference.matches(text);
 	}
 
+	faceCount(): number {
+		return this.pageCount;
+	}
+
 	toJSON(): AlbumDescription {
 		return {
 			reference: this.reference.toString(),
